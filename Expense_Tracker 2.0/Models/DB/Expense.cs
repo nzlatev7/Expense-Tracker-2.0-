@@ -26,9 +26,9 @@ namespace Expense_Tracker_2._0.Models.DB
 
 
         //one to many relationship
-
+        
         [ForeignKey(nameof(User))] //attribute  
-        public int UserId { get; set; } //FK
+        public int? UserId { get; set; } //FK ?????
         public User User { get; set; } //navigational property
     }
 }
