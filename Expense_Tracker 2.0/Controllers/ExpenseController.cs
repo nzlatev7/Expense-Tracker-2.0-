@@ -1,5 +1,6 @@
 ﻿using Expense_Tracker_2._0.Models.DB;
 using Expense_Tracker_2._0.Models.Request;
+using Expense_Tracker_2._0.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Expense_Tracker_2._0.Controllers
@@ -14,6 +15,18 @@ namespace Expense_Tracker_2._0.Controllers
         {
             _dbContext = dbContext;
             _configuration = configuration;
+        }
+
+        [HttpGet]
+        public List<ExpenseGetAllResponse> GetAll()
+        {
+            return _dbContext.Expenses.Select(x => new ExpenseGetAllResponse()
+            {
+                Name = x.Name,
+                Type = x.Type,
+                Date = x.Date,
+                Amount = x.Amount,
+            }).ToList();
         }
 
         [HttpPost]
