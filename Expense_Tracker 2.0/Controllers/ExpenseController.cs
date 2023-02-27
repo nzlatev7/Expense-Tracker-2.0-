@@ -52,6 +52,20 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
+        [HttpPut]
+        public ActionResult Update(ExpenseUpdateRequest request)
+        {
+            var expenseForUpdate = _dbContext.Expenses.Find(request.Id);
+
+            expenseForUpdate.Name = request.Name;
+            expenseForUpdate.Type = request.Type;
+            expenseForUpdate.Date = request.Date;
+            expenseForUpdate.Amount = request.Amount;
+
+            _dbContext.SaveChanges();
+            return Ok();
+        }
+
         [HttpDelete]
         public ActionResult Delete(ExpenseDeleteRequest request)
         {
