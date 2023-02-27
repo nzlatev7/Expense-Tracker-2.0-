@@ -22,6 +22,7 @@ namespace Expense_Tracker_2._0.Controllers
         {
             return _dbContext.Expenses.Select(x => new ExpenseGetAllResponse()
             {
+                Id = x.Id,
                 Name = x.Name,
                 Type = x.Type,
                 Date = x.Date,
