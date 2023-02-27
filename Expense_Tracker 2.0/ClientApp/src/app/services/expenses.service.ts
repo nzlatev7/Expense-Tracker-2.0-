@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -14,11 +14,14 @@ export class ExpensesService {
     return this.http.get(`${this.url}/Expense/GetAll`);
   }
 
-  insetrExpence(body:any){
+  insetrExpence(body: any) {
     return this.http.post(`${this.url}/Expense/Create`, body);
   }
 
-  deleteItem(id: any){
-    return this.http.delete(`${this.url}/Expense/Delete`, id);
+  deleteItem(id: any) {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+    return this.http.delete(`${this.url}/Expense/Delete`, { headers: headers, body: id });
   }
 }

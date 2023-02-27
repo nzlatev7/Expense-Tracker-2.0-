@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ExpensesService } from '../servises/expenses.service';
+import { ExpensesService } from '../services/expenses.service';
 
 @Component({
   selector: 'app-add-item',
@@ -25,10 +25,10 @@ export class AddItemComponent implements OnInit {
 
   getExpences() {
     this.http.getAll()
-    .subscribe({
-      next: (resp) => {this.items = resp, console.log(resp)},
-      error: (error) => console.log(error)
-    });
+      .subscribe({
+        next: (resp) => this.items = resp,
+        error: (error) => console.log(error)
+      });
   }
 
 
@@ -41,25 +41,20 @@ export class AddItemComponent implements OnInit {
     }
 
     this.http.insetrExpence(body).subscribe({
-      next(resp) {
-        console.log('Response: ', resp);
-      },
-      error(err) {
-        console.log('Error: ', err);
-      }
-    });
-
-    this.getExpences();
-
-  }
-
-  deleteExpense(id: any){
-    this.http.deleteItem(id)
-    .subscribe({
-      next: (resp) => console.log(resp),
+      next: () => this.getExpences(),
       error: (error) => console.log(error)
     });
-    
-    this.getExpences();
+  }
+
+  deleteExpense(id: number) {
+    const request = {
+      "id": id
+    }
+
+    this.http.deleteItem(request)
+      .subscribe({
+        next: () => this.getExpences(),
+        error: (error) => console.log(error)
+      });
   }
 }
