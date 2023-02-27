@@ -15,7 +15,10 @@ export class ExpensesService {
   }
 
   insetrExpence(body:any){
-    return this.http.post(`${this.url}/Expense/Create`,body);
+    return this.http.post(`${this.url}/Expense/Create`, body);
   }
 
+  deleteItem(id: any){
+    return this.http.delete(`${this.url}/Expense/Delete`, id);
+  }
 }

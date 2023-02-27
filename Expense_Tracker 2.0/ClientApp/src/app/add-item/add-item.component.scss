@@ -1,9 +1,28 @@
-input{
+input {
     width: 300px;
 }
-.main{
+
+.main {
     background-color: aliceblue;
     border-radius: 20px;
     border: 2px solid gray;
-    padding: 100px;
+    padding: 50px;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.divTable {
+    height: 205px;
+    overflow-y: scroll;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    position: sticky;
+    z-index: 2;
+    top: 0;
 }

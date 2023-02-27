@@ -21,16 +21,13 @@ export class AddItemComponent implements OnInit {
     amount: 0
   }
 
-  items: item[] = [];
+  items: any = [];
 
   getExpences() {
-    this.http.getAll().subscribe({
-      next(resp) {
-        console.log('Response: ', resp);
-      },
-      error(err) {
-        console.log('Error: ', err);
-      }
+    this.http.getAll()
+    .subscribe({
+      next: (resp) => {this.items = resp, console.log(resp)},
+      error: (error) => console.log(error)
     });
   }
 
@@ -51,12 +48,18 @@ export class AddItemComponent implements OnInit {
         console.log('Error: ', err);
       }
     });
-  }
-}
 
-type item = {
-  name: string,
-  type: string,
-  date: string,
-  amount: number
+    this.getExpences();
+
+  }
+
+  deleteExpense(id: any){
+    this.http.deleteItem(id)
+    .subscribe({
+      next: (resp) => console.log(resp),
+      error: (error) => console.log(error)
+    });
+    
+    this.getExpences();
+  }
 }
