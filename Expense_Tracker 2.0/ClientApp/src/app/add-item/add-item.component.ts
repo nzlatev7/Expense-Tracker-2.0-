@@ -11,16 +11,8 @@ export class AddItemComponent implements OnInit {
   constructor(private http: ExpensesService) { }
 
   bool: boolean = false;
-  
-  private id: number = 0;
 
-  private body = {
-    id: 0,
-    name: '',
-    type: '',
-    date: '',
-    amount: 0
-  }
+  private id: number = 0;
 
   ngOnInit(): void {
     this.getExpences();
@@ -70,6 +62,7 @@ export class AddItemComponent implements OnInit {
       next: () => this.getExpences(),
       error: (error) => console.log(error)
     });
+    this.cancel();
   }
 
   deleteExpense(id: number) {
@@ -86,9 +79,11 @@ export class AddItemComponent implements OnInit {
 
   changeForm(body: any){
     this.bool = true;
-    this.form = body;
+    this.form.amount = body.amount;
+    this.form.name = body.name;
+    this.form.date = body.date;
+    this.form.type = body.type;
     this.id = body.id;
-    this.body = body;
   }
 
   cancel(){
