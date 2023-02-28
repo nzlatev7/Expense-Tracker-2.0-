@@ -18,6 +18,10 @@ export class ExpensesService {
     return this.http.post(`${this.url}/Expense/Create`, body);
   }
 
+  update(body: any){
+    return this.http.put(`${this.url}/Expense/Update`, body);
+  }
+
   deleteItem(id: any) {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
