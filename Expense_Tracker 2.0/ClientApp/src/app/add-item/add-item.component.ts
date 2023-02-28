@@ -11,7 +11,17 @@ export class AddItemComponent implements OnInit {
   constructor(private http: ExpensesService) { }
 
   bool: boolean = false;
+  
   private id: number = 0;
+
+  private body = {
+    id: 0,
+    name: '',
+    type: '',
+    date: '',
+    amount: 0
+  }
+
   ngOnInit(): void {
     this.getExpences();
   }
@@ -57,7 +67,7 @@ export class AddItemComponent implements OnInit {
       "amount": this.form.amount
     }
     this.http.update(body).subscribe({
-      next: (resp) => this.getExpences(),
+      next: () => this.getExpences(),
       error: (error) => console.log(error)
     });
   }
@@ -78,7 +88,7 @@ export class AddItemComponent implements OnInit {
     this.bool = true;
     this.form = body;
     this.id = body.id;
-    console.log(this.id)
+    this.body = body;
   }
 
   cancel(){
