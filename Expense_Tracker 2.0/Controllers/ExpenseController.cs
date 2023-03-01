@@ -65,6 +65,23 @@ namespace Expense_Tracker_2._0.Controllers
         [HttpPut]
         public ActionResult Update(ExpenseUpdateRequest request)
         {
+            //Validation for Information required
+            if (request.Name == String.Empty || request.Type == String.Empty
+                || request.Date == String.Empty || request.Amount == 0)
+            {
+                return BadRequest("Information required");
+            }
+            //Validation for Name Lenght, (name -> 1 - 30)
+            if (request.Name.Length < 1 || request.Name.Length > 30)
+            {
+                return BadRequest("Name Lenght");
+            }
+            //Validation for Name Lenght, (amount -> 0 - 10000)
+            if (request.Amount < 0 || request.Amount > 10000)
+            {
+                return BadRequest("Invalid Amount");
+            }
+
             var expenseForUpdate = _dbContext.Expenses.Find(request.Id);
 
             expenseForUpdate.Name = request.Name;
