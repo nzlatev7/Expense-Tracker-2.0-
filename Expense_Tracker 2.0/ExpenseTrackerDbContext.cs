@@ -15,8 +15,7 @@ namespace Expense_Tracker_2._0
         {
             modelBuilder.Entity<Expense>()
                 .Property(b => b.UserId)
-                .IsRequired(false);
+                .IsRequired();
         }
-        //fluent API???
     }
 }
