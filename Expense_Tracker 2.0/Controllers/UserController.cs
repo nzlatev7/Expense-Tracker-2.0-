@@ -31,7 +31,7 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPost]
         public ActionResult Login(UserLoginRequest request)
         {
             var user = _dbContext.Users.Any(x => x.UserName == request.UserName && x.Password == request.Password);
