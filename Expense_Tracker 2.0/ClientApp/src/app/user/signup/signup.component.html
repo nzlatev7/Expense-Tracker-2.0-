@@ -1,0 +1,29 @@
+<div class="main">
+    <div class="container input">
+        <div class="row">
+            <div class="col">
+                <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+                    <label for="username">Username</label><br>
+                    <input type="text" 
+                           name="username" 
+                           id="username" 
+                           ngModel
+                           class="form-control"><br>
+                    <label for="password">Password</label><br>
+                    <input type="text" 
+                           name="password" 
+                           id="password" 
+                           ngModel
+                           class="form-control"><br>
+                    <label for="mail">Mail</label><br>
+                    <input type="text" 
+                           name="mail" 
+                           id="mail" 
+                           ngModel
+                           class="form-control"><br>
+                    <input type="submit" class="btn btn-secondary">
+                </form>
+            </div>
+        </div>
+    </div>
+</div >
