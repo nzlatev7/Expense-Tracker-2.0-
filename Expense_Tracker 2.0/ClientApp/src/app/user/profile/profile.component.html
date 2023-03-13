@@ -1,1 +1,21 @@
-<p>profile works!</p>
+<div class="container">
+    <table class="table table-dark table-striped rounded mb-0">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Username</th>
+                <th scope="col">Password</th>
+                <th scope="col">Email</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of items">
+                <td scope="row" style="width: 25%;">{{item.id}}</td>
+                <td style="width: 25%;">{{item.userName}}</td>
+                <td style="width: 25%;">{{item.password}}</td>
+                <td style="width: 25%;">{{item.email}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
