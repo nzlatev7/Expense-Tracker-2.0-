@@ -11,16 +11,6 @@ export class ProfileComponent implements OnInit {
   constructor(private httpUser: UserService) { }
 
   ngOnInit(): void {
-    this.asd();
-  }
-
-  items: any = [];
-
-  asd(){
-    this.httpUser.getAll().subscribe({
-      next: (resp) => this.items = resp,
-      error: (err) => console.log(err)
-    })
   }
 
 }
