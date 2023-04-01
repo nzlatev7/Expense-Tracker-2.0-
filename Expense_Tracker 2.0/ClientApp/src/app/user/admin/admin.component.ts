@@ -22,4 +22,11 @@ export class AdminComponent implements OnInit {
       error: (err) => console.log(err)
     });
   }
+
+  deleteUser(id:any){
+    this.httpUser.deleteItem(id).subscribe({
+      next: () => this.getAllUsers(),
+      error: (err) => console.log(err)
+    });
+  }
 }

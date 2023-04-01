@@ -15,7 +15,10 @@
                         <td scope="row" style="width: 25%;">{{item.id}}</td>
                         <td style="width: 25%;">{{item.userName}}</td>
                         <td style="width: 25%;">{{item.password}}</td>
-                        <td style="width: 25%;">{{item.email}}</td>
+                        <td style="width: 25%;">
+                            {{item.email}}
+                            <button class="btn btn-danger" (click)="deleteUser(item)">Delete</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
