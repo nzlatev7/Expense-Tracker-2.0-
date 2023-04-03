@@ -14,17 +14,20 @@ export class AdminComponent implements OnInit {
     this.getAllUsers();
   }
 
-  items: any = [];
+  users: any = [];
 
   getAllUsers(){
     this.httpUser.getAll().subscribe({
-      next: (resp) => this.items = resp,
+      next: (resp) => this.users = resp,
       error: (err) => console.log(err)
     });
   }
 
-  deleteUser(id:any){
-    this.httpUser.deleteItem(id).subscribe({
+  deleteUser(id: number){
+    const body = {
+      id: id
+    }
+    this.httpUser.deleteItem(body).subscribe({
       next: () => this.getAllUsers(),
       error: (err) => console.log(err)
     });
