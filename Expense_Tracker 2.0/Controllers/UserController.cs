@@ -1,7 +1,12 @@
 ﻿using Expense_Tracker_2._0.Models.DB;
 using Expense_Tracker_2._0.Models.Request;
 using Expense_Tracker_2._0.Models.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Expense_Tracker_2._0.Controllers
@@ -53,13 +58,33 @@ namespace Expense_Tracker_2._0.Controllers
         [HttpPost]
         public ActionResult Login(UserLoginRequest request)
         {
-            var user = _dbContext.Users.Any(x => x.UserName == request.UserName && x.Password == request.Password);
-            if (!user)
+            var user = _dbContext.Users.Where(x => x.UserName == request.UserName && x.Password == request.Password).FirstOrDefault();
+            if (user == null)
             {
                 return BadRequest("Wrong username or password.");
             }
             //else return the JWT token
-            return Ok();
+            string token = CreateJwtToken(user);
+            return Ok(token);
+        }
+
+        private string CreateJwtToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+              {
+                  new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+              }),
+                Expires = DateTime.UtcNow.AddMinutes(10),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"]
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
 
         [HttpPut]
@@ -73,7 +98,7 @@ namespace Expense_Tracker_2._0.Controllers
             _dbContext.SaveChanges();
             return Ok();
         }
-
+        [Authorize]
         [HttpGet]
         public List<UserGetAllResponse> GetAll()
         {
