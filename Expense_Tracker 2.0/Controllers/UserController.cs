@@ -30,6 +30,7 @@ namespace Expense_Tracker_2._0.Controllers
             User user = new User();
             user.UserName = request.UserName;
             user.Password = request.Password;
+            user.Role = Role.Admin;
 
             user.Email = EmailValidation(request.Email) ? user.Email = request.Email : null;
 
@@ -76,7 +77,8 @@ namespace Expense_Tracker_2._0.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
               {
-                  new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                  new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                  new Claim(ClaimTypes.Role, user.Role.ToString()),
               }),
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature),
@@ -98,7 +100,8 @@ namespace Expense_Tracker_2._0.Controllers
             _dbContext.SaveChanges();
             return Ok();
         }
-        [Authorize]
+
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public List<UserGetAllResponse> GetAll()
         {
@@ -111,6 +114,7 @@ namespace Expense_Tracker_2._0.Controllers
                 Expenses = _dbContext.Expenses.Where(x => x.UserId == x.Id).ToList()
             }).ToList();
         }
+
 
         [HttpDelete]
         public ActionResult Delete(UserDeleteRequest request)
