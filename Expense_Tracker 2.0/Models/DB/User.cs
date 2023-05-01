@@ -2,6 +2,12 @@
 
 namespace Expense_Tracker_2._0.Models.DB
 {
+    public enum Role
+    { 
+        Admin,
+        Customer,
+    }
+
     public class User
     {
         //[Required] - not null
@@ -15,6 +21,10 @@ namespace Expense_Tracker_2._0.Models.DB
         [Required]
         [MaxLength(50)]
         public string Password { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public Role Role { get; set; }
 
         //this can be null
         [MaxLength(50)]
