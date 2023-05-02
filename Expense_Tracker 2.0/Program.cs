@@ -1,4 +1,5 @@
 using Expense_Tracker_2._0;
+using Expense_Tracker_2._0.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -66,6 +67,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddCors();
+
+//register the JwtService, this add out serivce to the dependency injection system
+builder.Services.AddScoped<IJwtService, JwtService>();
+
 var app = builder.Build();
 
 
