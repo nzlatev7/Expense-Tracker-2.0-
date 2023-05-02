@@ -1,6 +1,7 @@
 ﻿using Expense_Tracker_2._0.Models.DB;
 using Expense_Tracker_2._0.Models.Request;
 using Expense_Tracker_2._0.Models.Response;
+using Expense_Tracker_2._0.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,12 +16,15 @@ namespace Expense_Tracker_2._0.Controllers
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
-        private IConfiguration _configuration;
         private ExpenseTrackerDbContext _dbContext;
-        public UserController(ExpenseTrackerDbContext dbContext, IConfiguration configuration)
+        private IConfiguration _configuration;
+        private IJwtService _jwtService;
+        
+        public UserController(ExpenseTrackerDbContext dbContext, IConfiguration configuration, IJwtService jwtService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
+            _jwtService = jwtService;
         }
 
         [HttpPost]
@@ -30,7 +34,7 @@ namespace Expense_Tracker_2._0.Controllers
             User user = new User();
             user.UserName = request.UserName;
             user.Password = request.Password;
-            user.Role = Role.Admin;
+            user.Role = Role.Customer;
 
             user.Email = EmailValidation(request.Email) ? user.Email = request.Email : null;
 
@@ -89,11 +93,14 @@ namespace Expense_Tracker_2._0.Controllers
             return tokenHandler.WriteToken(token);
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpPut]
         public ActionResult Update(UserUpdateRequest request)
         {
-            //update's username - unique
-            var userForUpdate = _dbContext.Users.Find(request.Id);
+            int id = _jwtService.GetUserIdFromToken(User);
+
+            //update's username - unique - need to make the validations
+            var userForUpdate = _dbContext.Users.Find(id);
             userForUpdate.UserName = request.UserName;
             userForUpdate.Password = request.Password;
             userForUpdate.Email = request.Email;
@@ -101,25 +108,27 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Customer")]
         [HttpGet]
-        public List<UserGetAllResponse> GetAll()
+        public UserGetInfoResponse GetInfo()
         {
-            return _dbContext.Users.Select(x => new UserGetAllResponse()
-                {
+            int id = _jwtService.GetUserIdFromToken(User);
+            return _dbContext.Users.Where(x => x.Id == id).Select(x => new UserGetInfoResponse()
+            {
                 Id = x.Id,
                 UserName = x.UserName,
                 Password = x.Password,
                 Email = x.Email,
-                Expenses = _dbContext.Expenses.Where(x => x.UserId == x.Id).ToList()
-            }).ToList();
+            }).Single();
         }
 
-
+        [Authorize(Roles = "Customer")]
         [HttpDelete]
-        public ActionResult Delete(UserDeleteRequest request)
+        public ActionResult Delete()
         {
-            var userForDelete = _dbContext.Users.Find(request.Id);
+            int id = _jwtService.GetUserIdFromToken(User);
+            var userForDelete = _dbContext.Users.Find(id);
+
             _dbContext.Users.Remove(userForDelete);
             _dbContext.SaveChanges();
             return Ok();
