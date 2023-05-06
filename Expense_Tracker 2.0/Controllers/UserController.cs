@@ -20,7 +20,10 @@ namespace Expense_Tracker_2._0.Controllers
         private IConfiguration _configuration;
         private IJwtService _jwtService;
         
-        public UserController(ExpenseTrackerDbContext dbContext, IConfiguration configuration, IJwtService jwtService)
+        public UserController(
+            ExpenseTrackerDbContext dbContext, 
+            IConfiguration configuration, 
+            IJwtService jwtService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
@@ -64,7 +67,7 @@ namespace Expense_Tracker_2._0.Controllers
             user.UserName = request.UserName;
             user.Password = request.Password;
             user.Email = request.Email;
-            user.Role = Role.Customer;
+            user.Role = Role.Admin;
             
             _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
@@ -166,7 +169,6 @@ namespace Expense_Tracker_2._0.Controllers
             int id = _jwtService.GetUserIdFromToken(User);
             return _dbContext.Users.Where(x => x.Id == id).Select(x => new UserGetInfoResponse()
             {
-                Id = x.Id,
                 UserName = x.UserName,
                 Password = x.Password,
                 Email = x.Email,
