@@ -1,26 +1,36 @@
 ﻿using Expense_Tracker_2._0.Models.DB;
 using Expense_Tracker_2._0.Models.Request;
 using Expense_Tracker_2._0.Models.Response;
+using Expense_Tracker_2._0.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Expense_Tracker_2._0.Controllers
 {
+    [Authorize(Roles = "Customer")]
     [ApiController]
     [Route("[controller]/[action]")]
     public class ExpenseController : ControllerBase
     {
         private IConfiguration _configuration;
+        private IJwtService _jwtService;
         private ExpenseTrackerDbContext _dbContext;
-        public ExpenseController(ExpenseTrackerDbContext dbContext, IConfiguration configuration)
+
+        public ExpenseController(
+            ExpenseTrackerDbContext dbContext, 
+            IConfiguration configuration, 
+            IJwtService jwtService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
+            _jwtService = jwtService;
         }
 
         [HttpGet]
-        public List<ExpenseGetAllResponse> GetAll()
+        public List<ExpenseGetAllResponse> GetAllByUserId()
         {
-            return _dbContext.Expenses.Select(x => new ExpenseGetAllResponse()
+            int userId = _jwtService.GetUserIdFromToken(User);
+            return _dbContext.Expenses.Where(x => x.UserId == userId).Select(x => new ExpenseGetAllResponse()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -33,17 +43,12 @@ namespace Expense_Tracker_2._0.Controllers
         [HttpPost]
         public ActionResult Create(ExpenseCreateRequest request)
         {
-            //Validation for Information required
-            if (request.Name == String.Empty || request.Type == String.Empty
-                || request.Date == String.Empty || request.Amount == 0)
-            {
-                return BadRequest("Information required");
-            }
             //Validation for Name Lenght, (name -> 1 - 30)
             if (request.Name.Length < 1 || request.Name.Length > 30)
             {
                 return BadRequest("Name Lenght");
             }
+
             //Validation for Name Lenght, (amount -> 0 - 10000)
             if (request.Amount < 0 || request.Amount > 10000)
             {
@@ -56,6 +61,7 @@ namespace Expense_Tracker_2._0.Controllers
                 newExpense.Type = request.Type;
                 newExpense.Date = request.Date;
                 newExpense.Amount = request.Amount;
+                newExpense.UserId = _jwtService.GetUserIdFromToken(User);
             }
             _dbContext.Expenses.Add(newExpense);
             _dbContext.SaveChanges();
@@ -65,12 +71,6 @@ namespace Expense_Tracker_2._0.Controllers
         [HttpPut]
         public ActionResult Update(ExpenseUpdateRequest request)
         {
-            //Validation for Information required
-            if (request.Name == String.Empty || request.Type == String.Empty
-                || request.Date == String.Empty || request.Amount == 0)
-            {
-                return BadRequest("Information required");
-            }
             //Validation for Name Lenght, (name -> 1 - 30)
             if (request.Name.Length < 1 || request.Name.Length > 30)
             {
@@ -96,13 +96,13 @@ namespace Expense_Tracker_2._0.Controllers
         [HttpDelete]
         public ActionResult Delete(ExpenseDeleteRequest request)
         {
-            var userForDelete = _dbContext.Expenses.Find(request.Id);
-            if (userForDelete == null)
+            var expenseForDelete = _dbContext.Expenses.Find(request.Id);
+            if (expenseForDelete == null)
             {
                 return NotFound();
             }
             
-            _dbContext.Expenses.Remove(userForDelete);
+            _dbContext.Expenses.Remove(expenseForDelete);
             _dbContext.SaveChanges();
             return Ok();
         }
