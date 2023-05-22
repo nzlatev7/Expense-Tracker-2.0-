@@ -8,28 +8,9 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class AdminComponent implements OnInit {
 
-  constructor(private httpUser: UserService) { }
+  constructor() { }
 
   ngOnInit(): void {
-    this.getAllUsers();
-  }
+  } 
 
-  users: any = [];
-
-  getAllUsers(){
-    this.httpUser.getAll().subscribe({
-      next: (resp) => this.users = resp,
-      error: (err) => console.log(err)
-    });
-  }
-
-  deleteUser(id: number){
-    const body = {
-      id: id
-    }
-    this.httpUser.deleteItem(body).subscribe({
-      next: () => this.getAllUsers(),
-      error: (err) => console.log(err)
-    });
-  }
 }

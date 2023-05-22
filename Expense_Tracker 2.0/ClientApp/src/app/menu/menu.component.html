@@ -2,10 +2,10 @@
     <h1>Menu</h1>
     <hr>
     <ul>
-        <li routerLinkActive="active-element" routerLink="home">Expenses</li>
-        <li  routerLinkActive="active-element" routerLink="sign-up">Sign up</li>
-        <li routerLinkActive="active-element" routerLink="log-in">Log in</li>
-        <li routerLinkActive="active-element" routerLink="my-profile">My profile</li>
-        <li  routerLinkActive="active-element" routerLink="admin">Admin</li>
+        <li *ngIf="loggedIn" routerLinkActive="active-element" routerLink="home">Expenses</li>
+        <li *ngIf="!loggedIn" routerLinkActive="active-element" routerLink="sign-up">Sign up</li>
+        <li *ngIf="!loggedIn" routerLinkActive="active-element" routerLink="log-in">Log in</li>
+        <li *ngIf="loggedIn" routerLinkActive="active-element" routerLink="my-profile">My profile</li>
+        <li *ngIf="loggedIn" routerLinkActive="active-element" routerLink="admin">Admin</li>
     </ul>
 </div>

@@ -8,9 +8,15 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class ProfileComponent implements OnInit {
 
-  constructor(private httpUser: UserService) { }
+  constructor(private user: UserService) { }
 
   ngOnInit(): void {
+    // this.user.getInfo().subscribe({
+    //   next: resp => console.log(resp),
+    //   error: error => console.log(error)
+    // })
   }
+
+
 
 }

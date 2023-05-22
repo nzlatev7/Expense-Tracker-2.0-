@@ -11,7 +11,7 @@ export class ExpensesService {
   url = "http://localhost:5085";
 
   getAll() {
-    return this.http.get(`${this.url}/Expense/GetAll`);
+    return this.http.get(`${this.url}/Expense/GetAllByUserId`);
   }
 
   insetrExpence(body: any) {
