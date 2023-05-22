@@ -5,6 +5,7 @@ import { AdminComponent } from './user/admin/admin.component';
 import { LoginComponent } from './user/login/login.component';
 import { ProfileComponent } from './user/profile/profile.component';
 import { SignupComponent } from './user/signup/signup.component';
+import { ErrorPageComponent } from './error-page/error-page.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -13,7 +14,8 @@ const routes: Routes = [
   { path: 'log-in', component: LoginComponent},
   { path: 'my-profile', component: ProfileComponent},
   { path: 'admin', component: AdminComponent},
-  { path: '**', redirectTo: 'home' }
+  { path: 'error', component: ErrorPageComponent},
+  { path: '**', redirectTo: 'error' }
 ];
 
 @NgModule({
