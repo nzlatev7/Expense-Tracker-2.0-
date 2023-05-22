@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -11,6 +11,8 @@ import { LoginComponent } from './user/login/login.component';
 import { SignupComponent } from './user/signup/signup.component';
 import { ProfileComponent } from './user/profile/profile.component';
 import { AdminComponent } from './user/admin/admin.component';
+import { JwtInterceptor } from './interceptors/jwt.interceptor';
+import { ErrorPageComponent } from './error-page/error-page.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +22,8 @@ import { AdminComponent } from './user/admin/admin.component';
     LoginComponent,
     SignupComponent,
     ProfileComponent,
-    AdminComponent
+    AdminComponent,
+    ErrorPageComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +31,10 @@ import { AdminComponent } from './user/admin/admin.component';
     HttpClientModule,
     FormsModule
   ],
-  providers: [NgForm],
+  providers: [
+    NgForm,
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -24,7 +24,6 @@ export class UserService {
   logIn(body: any){
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
-      
     })
     return this.http.post(`${this.url}/User/Login`, body, {headers: headers, responseType: "text"});
   }
@@ -45,7 +44,6 @@ export class UserService {
   }
 
   checkToken(){
-    console.log(123);
     const token = localStorage.getItem('token');
     if (token) {
       this.loggedIn = true;

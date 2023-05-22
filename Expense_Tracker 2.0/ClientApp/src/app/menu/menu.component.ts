@@ -15,9 +15,8 @@ export class MenuComponent implements OnInit {
   loggedIn = false;
 
   ngOnInit(): void {
-    this.user.currentMessage.subscribe(message => {this.loggedIn = message; console.log(message)});
+    this.user.currentMessage.subscribe(message => this.loggedIn = message);
     this.user.checkToken();
-    console.log("asd" + this.loggedIn)
   }
 
 }
