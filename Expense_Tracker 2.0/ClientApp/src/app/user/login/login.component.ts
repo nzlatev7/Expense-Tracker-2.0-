@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -26,9 +26,9 @@ export class LoginComponent implements OnInit {
       next: (token) => {
         if (token !== null) {
           localStorage.setItem('token', JSON.stringify(token));
-          this.router.navigate(['/home']);
           this.user.checkToken();
         }
+        this.router.navigate(['/add-new-item']);
       },
       error: (error) => console.log(error)
     });

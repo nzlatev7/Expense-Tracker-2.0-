@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ExpensesService } from '../services/expenses.service';
+import { ExpensesService } from '../core/services/expenses.service';
 
 @Component({
   selector: 'app-add-item',

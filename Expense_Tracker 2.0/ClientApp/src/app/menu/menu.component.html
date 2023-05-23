@@ -2,7 +2,8 @@
     <h1>Menu</h1>
     <hr>
     <ul>
-        <li *ngIf="loggedIn" routerLinkActive="active-element" routerLink="home">Expenses</li>
+        <li routerLinkActive="active-element" routerLink="home">Home</li>
+        <li *ngIf="loggedIn" routerLinkActive="active-element" routerLink="add-new-item">Expenses</li>
         <li *ngIf="!loggedIn" routerLinkActive="active-element" routerLink="sign-up">Sign up</li>
         <li *ngIf="!loggedIn" routerLinkActive="active-element" routerLink="log-in">Log in</li>
         <li *ngIf="loggedIn" routerLinkActive="active-element" routerLink="my-profile">My profile</li>
