@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
@@ -8,7 +9,8 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 export class ProfileComponent implements OnInit {
 
-  constructor(private user: UserService) { }
+  constructor(private user: UserService,
+              private router: Router) { }
 
   ngOnInit(): void {
     // this.user.getInfo().subscribe({
@@ -17,6 +19,13 @@ export class ProfileComponent implements OnInit {
     // })
   }
 
-
+  logOut(){
+    const token = localStorage.getItem('token');
+    localStorage.removeItem('token');
+    if (token) {
+      this.router.navigate(['/home']);
+      this.user.checkToken();
+    }
+  }
 
 }
