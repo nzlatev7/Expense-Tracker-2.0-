@@ -38,6 +38,7 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
+        //original
         [HttpGet]
         public List<AdminGetAllResponse> GetAll()
         {
@@ -50,6 +51,37 @@ namespace Expense_Tracker_2._0.Controllers
             }).ToList();
         }
 
+        //second try
+        [HttpGet]
+        public List<AdminGetAllResponse> GetAllStepByStep(int pageNumber) //default pageNumber is 0
+        {
+            return _dbContext.Users
+                .Skip(pageNumber * 10)
+                .Take(10)
+                .Select(x => new AdminGetAllResponse()
+                {
+                    Id = x.Id,
+                    UserName = x.UserName,
+                    Password = x.Password,
+                    Email = x.Email,
+                }).ToList();
+
+            // pageNumber++; // this incrementation need to be in the front-end
+
+        }
+        //private IEnumerable<AdminGetAllResponse> GetUser()
+        //{
+        //    foreach (var user in _dbContext.Users)
+        //    {
+        //        yield return new AdminGetAllResponse()
+        //        {
+        //            Id = user.Id,
+        //            UserName = user.UserName,
+        //            Password = user.Password,
+        //            Email = user.Email,
+        //        };
+        //    }
+        //}
 
         [HttpDelete]
         public ActionResult Delete(AdminDeleteRequest request)
