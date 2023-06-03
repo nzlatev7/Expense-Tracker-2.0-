@@ -15,7 +15,12 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmit(form: NgForm){
-    this.user.register(form.value).subscribe({
+    const body={
+      "userName": form.value.username,
+      "password": form.value.password,
+      "email": form.value.mail
+    }
+    this.user.register(body).subscribe({
       next: (resp) => console.log(resp),
       error: (error) => console.log(error)
     });
