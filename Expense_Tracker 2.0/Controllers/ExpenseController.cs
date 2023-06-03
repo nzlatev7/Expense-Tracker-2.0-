@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Expense_Tracker_2._0.Controllers
 {
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = "Customer, Admin")]
     [ApiController]
     [Route("[controller]/[action]")]
     public class ExpenseController : ControllerBase

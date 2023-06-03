@@ -38,7 +38,6 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
-        //original
         [HttpGet]
         public List<AdminGetAllResponse> GetAll()
         {
@@ -51,12 +50,11 @@ namespace Expense_Tracker_2._0.Controllers
             }).ToList();
         }
 
-        //second try
         [HttpGet]
-        public List<AdminGetAllResponse> GetAllStepByStep(int pageNumber) //default pageNumber is 0
+        public List<AdminGetAllResponse> GetAllStepByStep(int pageNumber)
         {
             return _dbContext.Users
-                .Skip(pageNumber * 10)
+                .Skip((pageNumber - 1) * 10)
                 .Take(10)
                 .Select(x => new AdminGetAllResponse()
                 {
@@ -66,22 +64,14 @@ namespace Expense_Tracker_2._0.Controllers
                     Email = x.Email,
                 }).ToList();
 
-            // pageNumber++; // this incrementation need to be in the front-end
+            // implement pagination using (skip, take)
+
+            // another way is to use 'yield return' which is a good choice
+            // when we retrieve a big amount of data, lazy loading and streaming effect
+            // here is more practical to use (skip,take),
+            // bacause we can have 'RANDOM ACCESS' - jump to a particular page
 
         }
-        //private IEnumerable<AdminGetAllResponse> GetUser()
-        //{
-        //    foreach (var user in _dbContext.Users)
-        //    {
-        //        yield return new AdminGetAllResponse()
-        //        {
-        //            Id = user.Id,
-        //            UserName = user.UserName,
-        //            Password = user.Password,
-        //            Email = user.Email,
-        //        };
-        //    }
-        //}
 
         [HttpDelete]
         public ActionResult Delete(AdminDeleteRequest request)

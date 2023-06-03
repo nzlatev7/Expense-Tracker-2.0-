@@ -67,7 +67,7 @@ namespace Expense_Tracker_2._0.Controllers
             user.UserName = request.UserName;
             user.Password = request.Password;
             user.Email = request.Email;
-            user.Role = Role.Admin;
+            user.Role = Role.Customer;
             
             _dbContext.Users.Add(user);
             _dbContext.SaveChanges();
