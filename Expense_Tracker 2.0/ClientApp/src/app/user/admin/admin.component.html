@@ -1,6 +1,11 @@
 <div class="main">
     <div class="wrapper">
         <div class="mt-4">
+            <div>
+                <button class="menuBtn">All users</button>
+                <button class="menuBtn">Step by step</button>
+                <button class="menuBtn">Stream</button>
+            </div>
             <table class="table table-striped table-dark">
                 <thead>
                     <tr>
@@ -15,13 +20,25 @@
                         <th>{{user.userName}}</th>
                         <td>{{user.password}}</td>
                         <td>{{user.role}}</td>
-                        <td>@{{user.email}}</td>
+                        <td>
+                            <div class="d-flex justify-content-between">
+                            {{user.email}}
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-success me-2">Update</button>
+                                    <button class="btn btn-danger">Delete</button>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
             <div class="navigation">
-                <button class="btn btn-success"><</button>
-                <button class="btn btn-success" (click)="nextPage()">></button>
+                <button class="btn btn-success"
+                        (click)="previousPage()"
+                        [disabled]="firstPageLoaded"><</button>
+                <button class="btn btn-success"
+                        (click)="nextPage()"
+                        [disabled]="lastPageLoaded">></button>
             </div>
         </div>
     </div>

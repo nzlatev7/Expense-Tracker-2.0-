@@ -11,11 +11,13 @@ export class AdminComponent implements OnInit {
   constructor(private admin: AdminService) { }
 
   users: any = [];
-
+  
   currentPage = 1;
+  firstPageLoaded = true;
+  lastPageLoaded = false;
 
   ngOnInit(): void {
-    this.loadUsers()
+    this.loadUsers();
   } 
   
   loadUsers(){
@@ -28,9 +30,22 @@ export class AdminComponent implements OnInit {
   nextPage(){
     this.currentPage++;
     this.loadUsers();
+    this.pageCheck();
   }
 
-  
+  previousPage(){
+    this.currentPage--;
+    this.loadUsers();
+    this.pageCheck();
+  }
+
+  pageCheck(){
+    if (this.currentPage == 1) {
+      this.firstPageLoaded = true;
+    } else {
+      this.firstPageLoaded = false;
+    }
+  }
 
 
 }

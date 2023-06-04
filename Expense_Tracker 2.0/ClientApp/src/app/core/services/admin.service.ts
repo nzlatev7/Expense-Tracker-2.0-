@@ -11,10 +11,10 @@ export class AdminService {
   url = "http://localhost:5085";
 
   getUsers(body: any){
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-    });
-    return this.http.get(`${this.url}/Admin/GetAllStepByStep`, {headers});
+    let queryParams = {
+      'pageNumber': body
+    };
+    return this.http.get(`${this.url}/Admin/GetAllStepByStep`, {params:queryParams});
   } 
 
 }
