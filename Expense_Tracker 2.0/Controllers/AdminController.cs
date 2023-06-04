@@ -66,6 +66,7 @@ namespace Expense_Tracker_2._0.Controllers
                     Id = x.Id,
                     UserName = x.UserName,
                     Password = x.Password,
+                    Role = x.Role,
                     Email = x.Email,
                 }).ToList();
 
