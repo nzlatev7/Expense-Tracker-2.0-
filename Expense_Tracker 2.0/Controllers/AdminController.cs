@@ -51,9 +51,14 @@ namespace Expense_Tracker_2._0.Controllers
         }
 
         [HttpGet]
-        public List<AdminGetAllResponse> GetAllStepByStep(int pageNumber)
+        public ActionResult<List<AdminGetAllResponse>> GetAllStepByStep(int pageNumber)
         {
-            return _dbContext.Users
+            if (pageNumber <= 0)
+            {
+                return BadRequest("Page number must be a positive integer.");
+            }
+
+            var users = _dbContext.Users
                 .Skip((pageNumber - 1) * 10)
                 .Take(10)
                 .Select(x => new AdminGetAllResponse()
@@ -61,8 +66,11 @@ namespace Expense_Tracker_2._0.Controllers
                     Id = x.Id,
                     UserName = x.UserName,
                     Password = x.Password,
+                    Role = x.Role,
                     Email = x.Email,
                 }).ToList();
+
+            return Ok(users);
 
             // implement pagination using (skip, take)
 
@@ -70,7 +78,6 @@ namespace Expense_Tracker_2._0.Controllers
             // when we retrieve a big amount of data, lazy loading and streaming effect
             // here is more practical to use (skip,take),
             // bacause we can have 'RANDOM ACCESS' - jump to a particular page
-
         }
 
         [HttpDelete]
