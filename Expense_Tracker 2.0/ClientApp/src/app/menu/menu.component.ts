@@ -13,9 +13,11 @@ export class MenuComponent implements OnInit {
   constructor(private user: UserService) { }
 
   loggedIn = false;
+  isAdmin = false;
 
   ngOnInit(): void {
-    this.user.currentMessage.subscribe(message => this.loggedIn = message);
+    this.user.logged.subscribe(message => this.loggedIn = message);
+    this.user.Admin.subscribe(message => this.isAdmin = message);
     this.user.checkToken();
   }
 

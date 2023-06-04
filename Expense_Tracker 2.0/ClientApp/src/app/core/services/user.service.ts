@@ -15,7 +15,10 @@ export class UserService {
   loggedIn = false;
 
   private messageSource = new BehaviorSubject(false);
-  currentMessage = this.messageSource.asObservable();
+  logged = this.messageSource.asObservable();
+
+  private messageSource1 = new BehaviorSubject(false);
+  Admin = this.messageSource1.asObservable();
   
   register(body: any){
     return this.http.post(`${this.url}/User/Register`, body);
@@ -47,9 +50,24 @@ export class UserService {
     const token = localStorage.getItem('token');
     if (token) {
       this.loggedIn = true;
+      this.isAdmin();
     } else {
       this.loggedIn = false;
     }
     this.messageSource.next(this.loggedIn);
+  }
+
+  isAdmin(){
+    let jwt = localStorage.getItem('token');
+    jwt = JSON.stringify(jwt);
+    let jwtData = jwt.split('.')[1];
+    let decodedJwtJsonData = window.atob(jwtData);
+    let decodedJwtData = JSON.parse(decodedJwtJsonData);
+    let role = decodedJwtData.role;
+    if (role === "Admin") {
+      this.messageSource1.next(true);
+    } else {
+      this.messageSource1.next(false);
+    }
   }
 }

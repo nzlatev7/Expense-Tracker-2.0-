@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from 'src/app/core/services/user.service';
+import { AdminService } from 'src/app/core/services/admin.service';
 
 @Component({
   selector: 'app-admin',
@@ -8,9 +8,29 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 export class AdminComponent implements OnInit {
 
-  constructor() { }
+  constructor(private admin: AdminService) { }
+
+  users: any = [];
+
+  currentPage = 1;
 
   ngOnInit(): void {
+    this.loadUsers()
   } 
+  
+  loadUsers(){
+    this.admin.getUsers(this.currentPage).subscribe({
+      next: resp => this.users = resp,
+      error: error => console.log(error)
+    });
+  }
+
+  nextPage(){
+    this.currentPage++;
+    this.loadUsers();
+  }
+
+  
+
 
 }
