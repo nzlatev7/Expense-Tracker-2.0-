@@ -14,6 +14,9 @@ import { AdminComponent } from './user/admin/admin.component';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { HomePageComponent } from './home-page/home-page.component';
+import { AllUsersComponent } from './user/admin/all-users/all-users.component';
+import { StepByStepComponent } from './user/admin/step-by-step/step-by-step.component';
+import { UpdateComponent } from './user/admin/update/update.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +28,10 @@ import { HomePageComponent } from './home-page/home-page.component';
     ProfileComponent,
     AdminComponent,
     ErrorPageComponent,
-    HomePageComponent
+    HomePageComponent,
+    AllUsersComponent,
+    StepByStepComponent,
+    UpdateComponent
   ],
   imports: [
     BrowserModule,

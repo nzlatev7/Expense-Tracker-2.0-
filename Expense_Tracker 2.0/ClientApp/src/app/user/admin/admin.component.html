@@ -1,46 +1,22 @@
 <div class="main">
-    <div class="wrapper">
-        <div class="mt-4">
-            <div>
-                <button class="menuBtn">All users</button>
-                <button class="menuBtn">Step by step</button>
-                <button class="menuBtn">Stream</button>
-            </div>
-            <table class="table table-striped table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">Username</th>
-                        <th scope="col">Password</th>
-                        <th scope="col">Role</th>
-                        <th scope="col">Mail</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let user of users">
-                        <th>{{user.userName}}</th>
-                        <td>{{user.password}}</td>
-                        <td>{{user.role ? "Customer" : "Admin"}}</td>
-                        <td>
-                            <div class="d-flex justify-content-between">
-                            {{user.email}}
-                                <div class="d-flex justify-content-end">
-                                    <button class="btn btn-success me-2">Update</button>
-                                    <button class="btn btn-danger" 
-                                            (click)="delete(user.id)">Delete</button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="navigation">
-                <button class="btn btn-success"
-                        (click)="previousPage()"
-                        [disabled]="isFirstPage"><</button>
-                <button class="btn btn-success"
-                        (click)="nextPage()"
-                        [disabled]="isLastPage">></button>
-            </div>
+    <div>
+        <div>
+            <button class="menuBtn"
+                    routerLink='/admin/allUsers'
+                    routerLinkActive="active-element">
+                    All users
+            </button>
+            <button class="menuBtn"
+                    routerLink='/admin/stepByStep'
+                    routerLinkActive="active-element">
+                    Step by step
+            </button>
+            <button class="menuBtn"
+                    routerLink='/admin/userUpdate'
+                    routerLinkActive="active-element">
+                    Update
+            </button>
         </div>
+        <router-outlet></router-outlet>
     </div>
 </div>

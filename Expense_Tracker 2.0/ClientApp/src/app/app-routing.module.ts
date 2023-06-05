@@ -9,6 +9,9 @@ import { ErrorPageComponent } from './error-page/error-page.component';
 import { AuthGuardService } from './core/guards/auth-guard.service';
 import { HomePageComponent } from './home-page/home-page.component';
 import { AdminGuardService } from './core/guards/admin-guard.service';
+import { AllUsersComponent } from './user/admin/all-users/all-users.component';
+import { StepByStepComponent } from './user/admin/step-by-step/step-by-step.component';
+import { UpdateComponent } from './user/admin/update/update.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -17,7 +20,11 @@ const routes: Routes = [
   { path: 'sign-up', component: SignupComponent},
   { path: 'log-in', component: LoginComponent},
   { path: 'my-profile', canActivate:[AuthGuardService], component: ProfileComponent},
-  { path: 'admin', canActivate:[AuthGuardService, AdminGuardService], component: AdminComponent},
+  { path: 'admin', canActivate:[AuthGuardService, AdminGuardService], component: AdminComponent, children:[
+    { path: 'allUsers', component: AllUsersComponent},
+    { path: 'stepByStep', component: StepByStepComponent},
+    { path: 'userUpdate', component: UpdateComponent}
+  ]},
   { path: 'error', component: ErrorPageComponent},
   { path: '**', redirectTo: 'error' }
 ];

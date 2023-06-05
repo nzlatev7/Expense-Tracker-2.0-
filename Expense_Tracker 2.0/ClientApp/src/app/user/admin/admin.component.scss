@@ -1,31 +1,20 @@
 .main{
-    background-color: aliceblue;
+    background-color: rgba(44,48,52,255);
     width: calc(100vw - 250px);
     height: 100vh;
-}
-
-.wrapper{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 1000px;
-}
-
-.navigation{
-    display: flex;
-    justify-content: space-around;
+    
 }
 
 .menuBtn{
-    background-color: rgba(33,37,41,255);
+    background-color: rgba(44,48,52,255);
     color: rgba(255,255,255,255);
     border: none;
     border-radius: 7px 25px 0px 0px;
     padding: 10px 20px;
+}
+
+.active-element{
+    background-color: rgba(33,37,41,255);
+    border: 1px solid black;
+    border-bottom: 0px;
 }
