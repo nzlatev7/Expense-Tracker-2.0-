@@ -12,39 +12,54 @@ export class AdminComponent implements OnInit {
 
   users: any = [];
   
-  currentPage = 1;
-  firstPageLoaded = true;
-  lastPageLoaded = false;
+  currentPage: number = 1;
+
+  isFirstPage: boolean = true;
+  isLastPage: boolean = false;
 
   ngOnInit(): void {
     this.loadUsers();
   } 
   
-  loadUsers(){
+  loadUsers(): void {
     this.admin.getUsers(this.currentPage).subscribe({
-      next: resp => this.users = resp,
+      next: (resp: any) => {
+        this.users = resp;
+        if (resp.length < 10) {
+          this.isLastPage = true;
+        } else {
+          this.isLastPage = false;
+        }
+      },
       error: error => console.log(error)
     });
   }
 
-  nextPage(){
+  nextPage() : void {
     this.currentPage++;
     this.loadUsers();
     this.pageCheck();
   }
 
-  previousPage(){
+  previousPage() : void {
     this.currentPage--;
     this.loadUsers();
     this.pageCheck();
   }
 
-  pageCheck(){
+  pageCheck() : void{
     if (this.currentPage == 1) {
-      this.firstPageLoaded = true;
+      this.isFirstPage = true;
     } else {
-      this.firstPageLoaded = false;
+      this.isFirstPage = false;
     }
+  }
+
+  delete(id: number) : void{
+    this.admin.geleteUser(id).subscribe({
+      next: () => this.loadUsers(),
+      error: error => console.log(error)
+    })
   }
 
 

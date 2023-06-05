@@ -19,13 +19,14 @@
                     <tr *ngFor="let user of users">
                         <th>{{user.userName}}</th>
                         <td>{{user.password}}</td>
-                        <td>{{user.role}}</td>
+                        <td>{{user.role ? "Customer" : "Admin"}}</td>
                         <td>
                             <div class="d-flex justify-content-between">
                             {{user.email}}
                                 <div class="d-flex justify-content-end">
                                     <button class="btn btn-success me-2">Update</button>
-                                    <button class="btn btn-danger">Delete</button>
+                                    <button class="btn btn-danger" 
+                                            (click)="delete(user.id)">Delete</button>
                                 </div>
                             </div>
                         </td>
@@ -35,10 +36,10 @@
             <div class="navigation">
                 <button class="btn btn-success"
                         (click)="previousPage()"
-                        [disabled]="firstPageLoaded"><</button>
+                        [disabled]="isFirstPage"><</button>
                 <button class="btn btn-success"
                         (click)="nextPage()"
-                        [disabled]="lastPageLoaded">></button>
+                        [disabled]="isLastPage">></button>
             </div>
         </div>
     </div>

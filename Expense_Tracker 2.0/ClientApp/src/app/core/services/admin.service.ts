@@ -17,4 +17,14 @@ export class AdminService {
     return this.http.get(`${this.url}/Admin/GetAllStepByStep`, {params:queryParams});
   } 
 
+  geleteUser(id: number){
+    const body = {
+      'id': id
+    }
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+    return this.http.delete(`${this.url}/Admin/Delete`, {headers,body})
+  }
+
 }
