@@ -1,0 +1,18 @@
+main{
+    border: 1px solid black;
+    width: calc(100vw - 250px);
+    height: calc(100vh - 46px);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input{
+    padding: 20px;
+    width: 300px;
+    border-radius: 20px;
+    border: 1px solid wheat;
+    align-items: center;
+}
+

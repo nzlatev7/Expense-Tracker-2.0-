@@ -1,1 +1,41 @@
-<p>update works!</p>
+<main>
+    <form>
+        <div class="container input">
+            <div class="row">
+                <div class="col">
+                    <label for="userName">Username: </label>
+                    <input id="userName"
+                           class="form-control"
+                            type="text" 
+                            formControlName="userName">
+                    <br>
+                    <label for="password">Password: </label>
+                    <input id="password" 
+                           class="form-control"
+                            type="text" 
+                            formControlName="password">
+                    <br>
+                    <label for="role">Role: </label>
+                    <div class="col text-end">
+                        <select id="role" 
+                                class="form-control"
+                                type="text"
+                                formControlName="role"
+                                >
+                            <option value="0">Admin</option>
+                            <option value="1">Customer</option>
+                        </select>
+                    </div>
+                    <br>
+                    <label for="email">Mail: </label>
+                    <input id="email"
+                            class="form-control"
+                            type="text"
+                            formControlName="email">
+                    <br>
+                    <input type="submit" class="btn btn-dark">
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
