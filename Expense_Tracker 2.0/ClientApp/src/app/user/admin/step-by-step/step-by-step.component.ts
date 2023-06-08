@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AdminService } from 'src/app/core/services/admin.service';
 
 @Component({
@@ -7,7 +8,8 @@ import { AdminService } from 'src/app/core/services/admin.service';
   styleUrls: ['./step-by-step.component.scss']
 })
 export class StepByStepComponent implements OnInit {
-  constructor(private admin: AdminService) { }
+  constructor(private admin: AdminService,
+    private router: Router) { }
 
   users: any = [];
 
@@ -59,6 +61,11 @@ export class StepByStepComponent implements OnInit {
       next: () => this.loadUsers(),
       error: error => console.log(error)
     })
+  }
+
+  update(user: any): void {
+    this.router.navigate(["admin/userUpdate"]);
+    this.admin.passUserInfo(user);
   }
 
 }

@@ -13,6 +13,17 @@ export class UpdateComponent implements OnInit {
   constructor(private admin: AdminService) { }
 
   ngOnInit(): void {
+    this.admin.changeInfo$.subscribe({
+      next: resp => {
+        this.form.setValue({
+          id: resp.id,
+          userName: resp.userName,
+          password: resp.password,
+          role: resp.role,
+          email: resp.email
+        })
+      }
+    })
   }
 
   form = new FormGroup({
@@ -24,7 +35,7 @@ export class UpdateComponent implements OnInit {
   });
 
   onSubmit() {
-    
+
   }
 
 }
