@@ -2,14 +2,31 @@
     background-color: aliceblue;
     width: calc(100vw - 250px);
     height: 100vh;
-    padding-top: 150px;
+    display: flex;
 }
 .info{
     padding: 20px;
-    max-width: 300px;
     border-radius: 20px;
-    border: 1px solid black;
+    border: 1px solid rgb(0, 0, 0);
+    margin: auto;
+    width: 50%;
+    background-color: rgba(44,48,52,255);
+    color: white;
 }
 .logOutBtn{
-    width: 35%;
+    width: 30%;
+}
+
+.logOutBtn:nth-child(2){
+    background-color: violet;
+    color: white;
+}
+
+.logOutBtn:nth-child(2):hover{
+    background-color: rgb(224, 92, 224);
+}
+
+h3{
+    border-radius: 10px;
+    border: 1px solid violet;
 }

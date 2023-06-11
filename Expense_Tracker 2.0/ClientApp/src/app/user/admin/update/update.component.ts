@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { AdminComponent } from '../admin.component';
 import { AdminService } from 'src/app/core/services/admin.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-update',
@@ -10,7 +11,8 @@ import { AdminService } from 'src/app/core/services/admin.service';
 })
 export class UpdateComponent implements OnInit {
 
-  constructor(private admin: AdminService) { }
+  constructor(private admin: AdminService,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.admin.changeInfo$.subscribe({
@@ -26,7 +28,7 @@ export class UpdateComponent implements OnInit {
     })
   }
 
-  form = new FormGroup({
+  form : FormGroup = new FormGroup({
     id: new FormControl(0),
     userName: new FormControl(''),
     password: new FormControl(''),
@@ -34,18 +36,13 @@ export class UpdateComponent implements OnInit {
     email: new FormControl('')
   });
 
-  onSubmit() {
-    const body = {
-      "id": this.form.value.id,
-      "userName": this.form.value.userName,
-      "password": this.form.value.password,
-      "role": this.form.value.role,
-      "email": this.form.value.email
-    }
-    this.admin.updateUser(body).subscribe({
-      next: resp => console.log(resp),
-      error: error => console.log(error)
-    })
-  }
+  onSubmit() : void {
 
+    const body = this.form.value;
+
+    this.admin.updateUser(body).subscribe({
+      next: () => this.router.navigate(['/admin/stepByStep']),
+      error: error => console.log(error)
+    });
+  }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
@@ -9,7 +10,8 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 export class SignupComponent implements OnInit {
 
-  constructor(private user: UserService) { }
+  constructor(private user: UserService,
+              private router: Router) { }
 
   ngOnInit(): void {
   }
@@ -21,7 +23,7 @@ export class SignupComponent implements OnInit {
       "email": form.value.mail
     }
     this.user.register(body).subscribe({
-      next: (resp) => console.log(resp),
+      next: (resp) => this.router.navigate(['log-in']),
       error: (error) => console.log(error)
     });
   }

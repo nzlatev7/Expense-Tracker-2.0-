@@ -29,11 +29,6 @@ export class AdminService {
   }
 
   updateUser(requestBody: any) {
-    // const body = requestBody;
-    // console.log(body)
-    // const headers = new HttpHeaders({
-    //   'Content-Type': 'application/json'
-    // });
     return this.http.put(`${this.url}/Admin/Update`, requestBody);
   }
 

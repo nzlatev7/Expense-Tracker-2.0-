@@ -39,11 +39,8 @@ export class UserService {
     return this.http.get(`${this.url}/User/GetInfo`);
   }
 
-  deleteItem(id: any) {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    })
-    return this.http.delete(`${this.url}/User/Delete`, { headers: headers, body: id });
+  deleteItem() {
+    return this.http.delete(`${this.url}/User/Delete`);
   }
 
   checkToken(){
