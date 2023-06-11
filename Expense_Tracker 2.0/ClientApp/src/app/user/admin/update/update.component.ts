@@ -15,12 +15,12 @@ export class UpdateComponent implements OnInit {
   ngOnInit(): void {
     this.admin.changeInfo$.subscribe({
       next: resp => {
-        this.form.setValue({
-          id: resp.id,
-          userName: resp.userName,
-          password: resp.password,
-          role: resp.role,
-          email: resp.email
+        this.form.patchValue({
+          "id": resp.id,
+          "userName": resp.userName,
+          "password": resp.password,
+          "role": resp.role,
+          "email": resp.email
         })
       }
     })
@@ -35,7 +35,17 @@ export class UpdateComponent implements OnInit {
   });
 
   onSubmit() {
-
+    const body = {
+      "id": this.form.value.id,
+      "userName": this.form.value.userName,
+      "password": this.form.value.password,
+      "role": this.form.value.role,
+      "email": this.form.value.email
+    }
+    this.admin.updateUser(body).subscribe({
+      next: resp => console.log(resp),
+      error: error => console.log(error)
+    })
   }
 
 }
