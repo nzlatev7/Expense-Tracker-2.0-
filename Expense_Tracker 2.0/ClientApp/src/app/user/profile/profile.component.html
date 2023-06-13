@@ -1,31 +1,56 @@
 <div class="main">
     <div class="container info">
-        <div class="row">
-            <h2>Username:</h2>
-            <h3>{{ userInfo.userName }} </h3>
-        </div>
-        <br>
-        <div class="row mt-2">
-            <h2>My mail: </h2>
-            <h3 class="text-break">{{ userInfo.email }}</h3>
-        </div>
-        <br>
-        <div class="row mt-2">
-            <h2>Password:</h2>
-            <h3 *ngIf="password" class="d-flex justify-content-between">
-                {{ userInfo.password }}
-                <button (click)="hidePassword()" class="btn text-light">Hide password</button>
-            </h3>
-            <h3 *ngIf="!password" class="d-flex justify-content-end">
-                <button (click)="showPassword()" class="btn text-light">Show password</button>
-            </h3>
+        <div *ngIf="!onUpdate">
+            <div class="row">
+                <h2>Username:</h2>
+                <h3>{{ userInfo.userName }} </h3>
+            </div>
+            <br>
+            <div class="row mt-2">
+                <h2>My mail: </h2>
+                <h3 class="text-break">{{ userInfo.email }}</h3>
+            </div>
+            <br>
+            <div class="row mt-2">
+                <h2>Password:</h2>
+                <h3 class="text-break">{{ userInfo.password }}</h3>
+            </div>
+
+            <br>
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-success logOutBtn" (click)="change()">Update</button>
+                <button class="btn logOutBtn" (click)="logOut()">Log out</button>
+                <button class="btn btn-danger logOutBtn" (click)="deleteUser()">Delete acount</button>
+            </div>
         </div>
 
-        <br>
-        <div class="d-flex justify-content-between">
-            <button class="btn btn-success logOutBtn" (click)="updateUser()">Update</button>
-            <button class="btn logOutBtn" (click)="logOut()">Log out</button>
-            <button class="btn btn-danger logOutBtn" (click)="deleteUser()">Delete acount</button>
+        <div *ngIf="onUpdate">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <h2>Username:</h2>
+                    <input type="text"
+                           class="form-control"
+                           formControlName="userName">
+                </div>
+                <br>
+                <div class="row mt-2">
+                    <h2>My mail: </h2>
+                    <input type="text"
+                           class="form-control"
+                           formControlName="email">
+                </div>
+                <br>
+                <div class="row mt-2">
+                    <h2>Password:</h2>
+                    <input type="text"
+                           class="form-control" 
+                           formControlName="password">
+                </div>
+                <br>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-success logOutBtn">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -22,7 +22,7 @@ export class AddItemComponent implements OnInit {
     name: '',
     type: '',
     date: '',
-    amount: 0
+    amount: ''
   }
 
   items: any = [];
@@ -92,7 +92,7 @@ export class AddItemComponent implements OnInit {
       name: '',
       type: '',
       date: '',
-      amount: 0
+      amount: ''
     }
     this.id = 0;
   }

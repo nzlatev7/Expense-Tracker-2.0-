@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -19,21 +20,19 @@ export class ProfileComponent implements OnInit {
     })
   }
 
-  password: boolean = false;
-
-  showPassword(): void {
-    this.password = true;
-  }
-
-  hidePassword(): void {
-    this.password = false;
-  }
+  onUpdate: boolean = false;
 
   userInfo: any = {
     userName: "",
     password: "",
     email: ""
   }
+
+  form = new FormGroup({
+    userName: new FormControl(''),
+    password: new FormControl(''),
+    email: new FormControl('')
+  })
 
   logOut(): void {
     const token = localStorage.getItem('token');
@@ -44,11 +43,29 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  updateUser():void{
-    
+  onSubmit(): void {
+    const body = {
+      userName: this.form.value.userName,
+      password: this.form.value.password,
+      email: this.form.value.email
+    }
+    this.user.update(body).subscribe({
+      next: resp => console.log(resp),
+      error: err => console.log(err)
+    })
+    this.onUpdate = false;
   }
 
-  deleteUser():void{
+  change(): void {
+    this.onUpdate = true;
+    this.form.patchValue({
+      userName: this.userInfo.userName,
+      password: this.userInfo.password,
+      email: this.userInfo.email
+    })
+  }
+
+  deleteUser(): void {
     this.user.deleteItem().subscribe({
       next: resp => console.log(resp),
       error: err => console.log(err)

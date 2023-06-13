@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 export class UpdateComponent implements OnInit {
 
   constructor(private admin: AdminService,
-              private router: Router) { }
+    private router: Router) { }
 
   ngOnInit(): void {
     this.admin.changeInfo$.subscribe({
@@ -28,7 +28,7 @@ export class UpdateComponent implements OnInit {
     })
   }
 
-  form : FormGroup = new FormGroup({
+  form: FormGroup = new FormGroup({
     id: new FormControl(0),
     userName: new FormControl(''),
     password: new FormControl(''),
@@ -36,9 +36,15 @@ export class UpdateComponent implements OnInit {
     email: new FormControl('')
   });
 
-  onSubmit() : void {
+  onSubmit(): void {
 
-    const body = this.form.value;
+    const body = {
+      "id": this.form.value.id,
+      "userName": this.form.value.userName,
+      "password": this.form.value.password,
+      "role": JSON.parse(this.form.value.role),
+      "email": this.form.value.email
+    }
 
     this.admin.updateUser(body).subscribe({
       next: () => this.router.navigate(['/admin/stepByStep']),

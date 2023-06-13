@@ -29,6 +29,7 @@ export class AdminService {
   }
 
   updateUser(requestBody: any) {
+    console.log(requestBody);
     return this.http.put(`${this.url}/Admin/Update`, requestBody);
   }
 
