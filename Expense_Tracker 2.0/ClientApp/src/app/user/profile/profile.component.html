@@ -2,18 +2,16 @@
     <div class="container info">
         <div *ngIf="!onUpdate">
             <div class="row">
-                <h2>Username:</h2>
-                <h3>{{ userInfo.userName }} </h3>
-            </div>
-            <br>
-            <div class="row mt-2">
-                <h2>My mail: </h2>
-                <h3 class="text-break">{{ userInfo.email }}</h3>
-            </div>
-            <br>
-            <div class="row mt-2">
-                <h2>Password:</h2>
-                <h3 class="text-break">{{ userInfo.password }}</h3>
+                <div class="col">
+                    <h2>Username:</h2>
+                    <h3>{{ userInfo.userName }} </h3>
+                <br>
+                    <h2>My mail: </h2>
+                    <h3 class="text-break">{{ userInfo.email }}</h3>
+                <br>
+                    <h2>Password:</h2>
+                    <h3 class="text-break">{{ userInfo.password }}</h3>
+                </div>
             </div>
 
             <br>
@@ -27,28 +25,27 @@
         <div *ngIf="onUpdate">
             <form [formGroup]="form" (ngSubmit)="onSubmit()">
                 <div class="row">
-                    <h2>Username:</h2>
-                    <input type="text"
-                           class="form-control"
-                           formControlName="userName">
-                </div>
-                <br>
-                <div class="row mt-2">
-                    <h2>My mail: </h2>
-                    <input type="text"
-                           class="form-control"
-                           formControlName="email">
-                </div>
-                <br>
-                <div class="row mt-2">
-                    <h2>Password:</h2>
-                    <input type="text"
-                           class="form-control" 
-                           formControlName="password">
+                    <div class="col">
+                        <h2>Username:</h2>
+                        <input type="text"
+                               class="form-control"
+                               formControlName="userName">
+                        <br>
+                        <h2>My mail: </h2>
+                        <input type="text"
+                               class="form-control"
+                               formControlName="email">
+                        <br>
+                        <h2>Password:</h2>
+                        <input type="text"
+                               class="form-control" 
+                               formControlName="password">
+                    </div>
                 </div>
                 <br>
                 <div class="d-flex justify-content-between">
-                    <button class="btn btn-success logOutBtn">Submit</button>
+                    <button class="btn btn-success formBtn">Submit</button>
+                    <button class="btn btn-danger formBtn" (click)="back()">Back</button>
                 </div>
             </form>
         </div>

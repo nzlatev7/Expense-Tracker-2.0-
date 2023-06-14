@@ -53,6 +53,10 @@ export class ProfileComponent implements OnInit {
       next: resp => console.log(resp),
       error: err => console.log(err)
     })
+    this.back();
+  }
+
+  back(): void {
     this.onUpdate = false;
   }
 

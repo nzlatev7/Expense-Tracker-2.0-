@@ -2,7 +2,9 @@
     background-color: aliceblue;
     width: calc(100vw - 250px);
     height: 100vh;
-    padding-top: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .input{
     padding: 20px;
