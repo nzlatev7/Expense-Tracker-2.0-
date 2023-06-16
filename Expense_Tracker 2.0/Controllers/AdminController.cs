@@ -3,6 +3,8 @@ using Expense_Tracker_2._0.Models.Request;
 using Expense_Tracker_2._0.Models.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -25,34 +27,41 @@ namespace Expense_Tracker_2._0.Controllers
         }
 
         [HttpPut]
-        public ActionResult Update(AdminUpdateRequest request)
+        public ActionResult UpdateUser(AdminUpdateRequest request)
         {
-            //update's username - unique - need to add validation
-
             var userForUpdate = _dbContext.Users.Find(request.Id);
+
+            bool isNotUniqueUsername = _dbContext.Users
+                .Any(x => x.UserName == request.UserName);
+
+            if (isNotUniqueUsername)
+            {
+                return BadRequest("Username is not unique");
+            }
+
+            if (request.UserName.Length < 4 || request.UserName.Length > 25)
+            {
+                return BadRequest("Username Length");
+            }
+
+            if (request.Password.Length < 8 || request.Password.Length > 25)
+            {
+                return BadRequest("Password Length");
+            }
+
             userForUpdate.UserName = request.UserName;
             userForUpdate.Password = request.Password;
             userForUpdate.Role = request.Role;
-            userForUpdate.Email = request.Email;
             _dbContext.SaveChanges();
             return Ok();
         }
-
+        
         [HttpGet]
-        public List<AdminGetAllResponse> GetAll()
+        public ActionResult<List<AdminGetAllUsersResponse>> GetUsersByPage(int pageNumber)
         {
-            return _dbContext.Users.Select(x => new AdminGetAllResponse()
-            {
-                Id = x.Id,
-                UserName = x.UserName,
-                Password = x.Password,
-                Email = x.Email,
-            }).ToList();
-        }
+            //page size, sorting options, or search filters - more functionalities
+            // need to have an object for this data - good practise
 
-        [HttpGet]
-        public ActionResult<List<AdminGetAllResponse>> GetAllStepByStep(int pageNumber)
-        {
             if (pageNumber <= 0)
             {
                 return BadRequest("Page number must be a positive integer.");
@@ -61,7 +70,7 @@ namespace Expense_Tracker_2._0.Controllers
             var users = _dbContext.Users
                 .Skip((pageNumber - 1) * 10)
                 .Take(10)
-                .Select(x => new AdminGetAllResponse()
+                .Select(x => new AdminGetAllUsersResponse()
                 {
                     Id = x.Id,
                     UserName = x.UserName,
@@ -80,13 +89,64 @@ namespace Expense_Tracker_2._0.Controllers
             // bacause we can have 'RANDOM ACCESS' - jump to a particular page
         }
 
-        [HttpDelete]
-        public ActionResult Delete(AdminDeleteRequest request)
+        [HttpGet]
+        public async Task<IActionResult> StreamUsers()
         {
+            Response.Headers.Add("Content-Type", "text/event-stream");
+            Response.Headers.Add("Cache-Control", "no-cache");
+
+            foreach (var user in GetAllUsersIterator())
+            {
+                // Construct SSE event data
+                var eventData = $"data: {JsonSerializer.Serialize(user)}\n\n";
+
+                // Write the event data to the response body stream
+                await Response.Body.WriteAsync(Encoding.UTF8.GetBytes(eventData));
+                await Response.Body.FlushAsync();
+
+                // Delay or perform additional logic between sending events
+                await Task.Delay(1000);
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        public ActionResult DeleteUser(AdminDeleteRequest request)
+        {
+            const string password = "admin";
+
+            if (password != request.Password)
+            {
+                return Unauthorized("Invalid password");
+            }
+
             var userForDelete = _dbContext.Users.Find(request.Id);
+
             _dbContext.Users.Remove(userForDelete);
             _dbContext.SaveChanges();
             return Ok();
+        }
+
+        private IEnumerable<AdminGetAllUsersResponse> GetAllUsersIterator()
+        {
+            foreach (var user in _dbContext.Users)
+            {
+                var userForReturning = new AdminGetAllUsersResponse()
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Password = user.Password,
+                    Role = user.Role,
+                    Email = user.Email,
+                };
+
+                yield return userForReturning;
+            }
+
+            //Using yield return in combination with batch retrieval allows you
+            //to implement lazy loading or paging mechanisms, where the interface
+            //or consumer can request and process users in smaller chunks as needed.
         }
     }
 }
