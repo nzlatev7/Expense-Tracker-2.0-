@@ -66,8 +66,10 @@ builder.Services.AddSwaggerGen(options =>
                   });
 });
 
+//configure the CORS service
 builder.Services.AddCors();
 
+//Services
 //register the JwtService, this add out serivce to the dependency injection system
 builder.Services.AddScoped<IJwtService, JwtService>();
 
@@ -82,10 +84,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(builder =>
-builder.WithOrigins("http://localhost:4200")
+builder.WithOrigins("http://127.0.0.1:5500") // Allow requests from a specific origin
+// It is generally recommended to specify the allowed origins explicitly
+// rather than allowing requests from any origin (*)
 .AllowAnyHeader()
-.AllowCredentials()
-.AllowAnyMethod());
+.AllowAnyMethod()); // Get, Post, Put Delete
 
 //jwt
 app.UseAuthentication();

@@ -34,8 +34,8 @@ namespace Expense_Tracker_2._0.Controllers
         public ActionResult Register(UserRegisterRequest request)
         {
             //validation
-            bool isUniqueUsername = _dbContext.Users.Select(x => x.UserName).Contains(request.UserName);
-            if (isUniqueUsername)
+            bool isNotUniqueUsername = _dbContext.Users.Select(x => x.UserName).Contains(request.UserName);
+            if (isNotUniqueUsername)
             {
                 return BadRequest("Username is not unique");
             }
