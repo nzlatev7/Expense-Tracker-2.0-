@@ -1,13 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private _zone: NgZone) { }
 
   url = "http://localhost:5085";
 
@@ -40,4 +42,41 @@ export class AdminService {
     this.info$.next(info);
   }
 
+  // getSSE(): Observable<T> {
+  //   let token = localStorage.getItem('token');
+  //   const headers = new HttpHeaders({
+  //     'Authorization': `Bearer ${token}`
+  //   }) 
+
+
+  //   const eventSource = new EventSource(`${this.url}/Admin/StreamUsers`);
+
+  //   return new Observable(observer => {
+  //     eventSource.onmessage = event => {
+  //       const messageData: MessageData = JSON.parse(event.data);
+  //       observer.next(messageData);
+  //     };
+  //   });
+  // }
+
+  getSSE(): Observable<any> {
+
+    let token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    })
+    return new Observable(observer => {
+      const eventSource = new EventSource(`${this.url}/Admin/StreamUsers`);
+      eventSource.onmessage = event => {
+        this._zone.run(() => {
+          observer.next(event);
+        });
+      };
+      eventSource.onerror = error => {
+        this._zone.run(() => {
+          observer.error(error);
+        });
+      };
+    });
+  }
 }
