@@ -1,5 +1,7 @@
 using Expense_Tracker_2._0;
+using Expense_Tracker_2._0.Hubs;
 using Expense_Tracker_2._0.Services;
+using Expense_Tracker_2._0.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -66,12 +68,17 @@ builder.Services.AddSwaggerGen(options =>
                   });
 });
 
+//SingalR
+builder.Services.AddSignalR();
+
 //configure the CORS service
 builder.Services.AddCors();
 
 //Services
-//register the JwtService, this add out serivce to the dependency injection system
-builder.Services.AddScoped<IJwtService, JwtService>();
+//this add out serivce to the dependency injection system
+//take care of creating and managing the service instances
+builder.Services.AddScoped<IJwtService, JwtService>(); //register the JwtService
+builder.Services.AddTransient<IEmailService, EmailService>(); // Register the Email service
 
 var app = builder.Build();
 
@@ -84,7 +91,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(builder =>
-builder.WithOrigins("http://127.0.0.1:5500") // Allow requests from a specific origin
+builder.WithOrigins("http://localhost:4200").AllowCredentials() // Allow requests from a specific origin
 // It is generally recommended to specify the allowed origins explicitly
 // rather than allowing requests from any origin (*)
 .AllowAnyHeader()
@@ -95,5 +102,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+//mapHub SingalR
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
