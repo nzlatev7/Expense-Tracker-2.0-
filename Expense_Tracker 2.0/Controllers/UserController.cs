@@ -2,6 +2,7 @@
 using Expense_Tracker_2._0.Models.Request;
 using Expense_Tracker_2._0.Models.Response;
 using Expense_Tracker_2._0.Services;
+using Expense_Tracker_2._0.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -16,18 +17,21 @@ namespace Expense_Tracker_2._0.Controllers
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
-        private ExpenseTrackerDbContext _dbContext;
-        private IConfiguration _configuration;
-        private IJwtService _jwtService;
-        
+        private readonly ExpenseTrackerDbContext _dbContext;
+        private readonly IConfiguration _configuration;
+        private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
+
         public UserController(
             ExpenseTrackerDbContext dbContext, 
             IConfiguration configuration, 
-            IJwtService jwtService)
+            IJwtService jwtService,
+            IEmailService emailService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
             _jwtService = jwtService;
+            _emailService = emailService;
         }
 
         [HttpPost]
@@ -63,14 +67,18 @@ namespace Expense_Tracker_2._0.Controllers
                 return BadRequest("Invalid Email");
             }
 
+
             User user = new User();
             user.UserName = request.UserName;
             user.Password = request.Password;
             user.Email = request.Email;
             user.Role = Role.Customer;
-            
-            _dbContext.Users.Add(user);
-            _dbContext.SaveChanges();
+
+            //_dbContext.Users.Add(user);
+            //_dbContext.SaveChanges();
+
+            _emailService.SendConfirmationEmailAsync(request.Email, user.Id);
+
             return Ok();
         }
 
