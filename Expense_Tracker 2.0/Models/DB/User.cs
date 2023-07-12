@@ -26,9 +26,10 @@ namespace Expense_Tracker_2._0.Models.DB
         [MaxLength(50)]
         public Role Role { get; set; }
 
-        //this can be null
         [MaxLength(50)]
-        public string? Email { get; set; }
+        public string Email { get; set; }
+
+        public bool IsEmailVerified { get; set; }
 
         //one to many
         public ICollection<Expense> Expenses { get; set; }
