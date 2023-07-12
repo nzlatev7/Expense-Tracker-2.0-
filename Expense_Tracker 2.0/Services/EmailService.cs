@@ -1,4 +1,5 @@
-﻿using Expense_Tracker_2._0.Services.Interfaces;
+﻿using Expense_Tracker_2._0.Models.Request;
+using Expense_Tracker_2._0.Services.Interfaces;
 using System.Net;
 using System.Net.Mail;
 
@@ -12,17 +13,13 @@ namespace Expense_Tracker_2._0.Services
         private const int PortNumber = 587;
 
         private readonly IConfiguration _configuration;
-        private readonly IValidationToken _validationToken;
 
-        public EmailService(
-            IConfiguration configuration,
-            IValidationToken validationToken)
+        public EmailService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _validationToken = validationToken;
         }
 
-        public async Task SendConfirmationEmailAsync(string recipientEmail, int userId)
+        public async Task SendAsync(EmailSendAsyncRequest request)
         {
             try
             {
@@ -32,12 +29,9 @@ namespace Expense_Tracker_2._0.Services
                 // Create a MailMessage object
                 MailMessage mail = new MailMessage();
                 mail.From = new MailAddress(senderEmail);
-                mail.To.Add(new MailAddress(recipientEmail));
-                mail.Subject = "Verify your Email Address!";
-
-                //generate the token - 4 digits
-                var token = _validationToken.GenerateEmailToken(userId);
-                mail.Body = $"This is the token: {token.Token}"; //??? token
+                mail.To.Add(new MailAddress(request.RecipientEmail));
+                mail.Subject = request.Subject;
+                mail.Body = request.Body;
 
                 // Set up the SmtpClient
                 SmtpClient smtpClient = new SmtpClient(SmtpServer, PortNumber);
