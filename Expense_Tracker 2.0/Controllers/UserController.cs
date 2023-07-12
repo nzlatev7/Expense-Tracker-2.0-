@@ -21,24 +21,29 @@ namespace Expense_Tracker_2._0.Controllers
         private readonly IConfiguration _configuration;
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
+        private readonly IValidationToken _validationToken;
 
         public UserController(
             ExpenseTrackerDbContext dbContext, 
             IConfiguration configuration, 
             IJwtService jwtService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IValidationToken validationToken)
         {
             _dbContext = dbContext;
             _configuration = configuration;
             _jwtService = jwtService;
             _emailService = emailService;
+            _validationToken = validationToken;
         }
 
         [HttpPost]
         public ActionResult Register(UserRegisterRequest request)
         {
-            //validation
-            bool isNotUniqueUsername = _dbContext.Users.Select(x => x.UserName).Contains(request.UserName);
+            bool isNotUniqueUsername = _dbContext.Users
+                .Select(x => x.UserName)
+                .Contains(request.UserName);
+
             if (isNotUniqueUsername)
             {
                 return BadRequest("Username is not unique");
@@ -74,10 +79,80 @@ namespace Expense_Tracker_2._0.Controllers
             user.Email = request.Email;
             user.Role = Role.Customer;
 
-            //_dbContext.Users.Add(user);
-            //_dbContext.SaveChanges();
+            _dbContext.Users.Add(user);
+            _dbContext.SaveChanges();
 
-            _emailService.SendConfirmationEmailAsync(request.Email, user.Id);
+            var token = _validationToken.Generate(user.Id);
+
+            _emailService.SendAsync(
+                new EmailSendAsyncRequest() 
+                { 
+                    RecipientEmail = user.Email,
+                    TokenValue = token.Value,
+                    ExpirationDate = token.ExpirationDate,
+                    Subject = "Verify your Email Address!",
+                    Body = $"This is the token: {token.Value} which expire on {token.ExpirationDate}"
+                });
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public ActionResult VerifyEmailToken(UserVerifyEmailTokenRequest request)
+        {
+            var token = _dbContext.ValidationTokens
+                .Where(t => t.Value == request.TokenValue)
+                .FirstOrDefault();
+
+            if (token == null)
+            {
+                return BadRequest("Invalid verification code. Please enter the correct code or request a new one.");
+            }
+
+            if (token.ExpirationDate < DateTime.UtcNow)
+            {
+                //clear the token
+                _validationToken.Clear(request.TokenValue);
+
+                return BadRequest("Verification code has expired. Please request a new one.");
+            }
+
+            var userForVerification = _dbContext.Users
+                .Where(x => x.Id == token.UserId)
+                .First();
+
+            userForVerification.IsEmailVerified = true;
+            _dbContext.SaveChanges();
+
+            //clear the token
+            _validationToken.Clear(request.TokenValue);
+
+            return Ok("Verified! You have successfully verified your account.");
+        }
+
+        [HttpPost]
+        public ActionResult ResendEmailToken(UserResendEmailTokenRequest request)
+        {
+            var user = _dbContext.Users
+                .Where(x => x.Email == request.Email)
+                .FirstOrDefault();
+
+            if (user == null)
+            {
+                return BadRequest("Invalid email!");
+            }
+
+            var token = _validationToken.Resend(user.Id);
+
+            _emailService.SendAsync(
+                new EmailSendAsyncRequest()
+                {
+                    RecipientEmail = request.Email,
+                    TokenValue = token.Value,
+                    ExpirationDate = token.ExpirationDate,
+                    Subject = "Verify your Email Address!",
+                    Body = $"This is the token: {token.Value} which expire on {token.ExpirationDate}"
+                });
 
             return Ok();
         }
@@ -85,13 +160,23 @@ namespace Expense_Tracker_2._0.Controllers
         [HttpPost]
         public ActionResult Login(UserLoginRequest request)
         {
-            var user = _dbContext.Users.Where(x => x.UserName == request.UserName && x.Password == request.Password).FirstOrDefault();
+            var user = _dbContext.Users
+                .Where(x => x.UserName == request.UserName && x.Password == request.Password)
+                .FirstOrDefault();
+
             if (user == null)
             {
                 return BadRequest("Wrong username or password.");
             }
+
+            if (!user.IsEmailVerified)
+            {
+                return BadRequest("Please verify your email address");
+            }
+
             //else return the JWT token
             string token = CreateJwtToken(user);
+
             return Ok(token);
         }
 
@@ -101,7 +186,6 @@ namespace Expense_Tracker_2._0.Controllers
         {
             int id = _jwtService.GetUserIdFromToken(User);
 
-            //update's username - unique - need to make the validations
             if (_dbContext.Users.Any(x => x.UserName == request.UserName))
             {
                 return BadRequest("Username is not unique");
@@ -117,7 +201,6 @@ namespace Expense_Tracker_2._0.Controllers
                 return BadRequest("Password Length");
             }
 
-            //email validation
             if (_dbContext.Users.Any(x => x.Email == request.Email))
             {
                 return BadRequest("There is already a user registered with this email address.");
@@ -134,7 +217,9 @@ namespace Expense_Tracker_2._0.Controllers
             userForUpdate.UserName = request.UserName;
             userForUpdate.Password = request.Password;
             userForUpdate.Email = request.Email;
+
             _dbContext.SaveChanges();
+
             return Ok();
         }
 
@@ -143,7 +228,10 @@ namespace Expense_Tracker_2._0.Controllers
         public UserGetInfoResponse GetInfo()
         {
             int id = _jwtService.GetUserIdFromToken(User);
-            return _dbContext.Users.Where(x => x.Id == id).Select(x => new UserGetInfoResponse()
+
+            return _dbContext.Users
+                .Where(x => x.Id == id)
+                .Select(x => new UserGetInfoResponse()
             {
                 UserName = x.UserName,
                 Password = x.Password,
@@ -160,6 +248,7 @@ namespace Expense_Tracker_2._0.Controllers
 
             _dbContext.Users.Remove(userForDelete);
             _dbContext.SaveChanges();
+
             return Ok();
         }
         private bool EmailValidation(string email)
@@ -172,6 +261,7 @@ namespace Expense_Tracker_2._0.Controllers
             {
                 return true;
             }
+
             return false;
         }
 
@@ -179,6 +269,7 @@ namespace Expense_Tracker_2._0.Controllers
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -191,7 +282,9 @@ namespace Expense_Tracker_2._0.Controllers
                 Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"]
             };
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
             return tokenHandler.WriteToken(token);
         }
     }
