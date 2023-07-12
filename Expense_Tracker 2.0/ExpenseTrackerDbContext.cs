@@ -10,6 +10,7 @@ namespace Expense_Tracker_2._0
         //tables
         public DbSet<User> Users { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<ValidationToken> ValidationTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
