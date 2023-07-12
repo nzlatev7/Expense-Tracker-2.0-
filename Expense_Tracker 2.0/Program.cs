@@ -79,6 +79,7 @@ builder.Services.AddCors();
 //take care of creating and managing the service instances
 builder.Services.AddScoped<IJwtService, JwtService>(); //register the JwtService
 builder.Services.AddTransient<IEmailService, EmailService>(); // Register the Email service
+builder.Services.AddTransient<IValidationToken, ValidationTokenService>(); // Register the ValidationToken service
 
 var app = builder.Build();
 
