@@ -65,7 +65,7 @@ namespace Expense_Tracker_2._0.Controllers
                 return BadRequest("There is already a user registered with this email address.");
             }
             
-            request.Email = EmailValidation(request.Email) ? request.Email = request.Email : null;
+            request.Email = _emailService.IsValid(request.Email) ? request.Email = request.Email : null;
 
             if (request.Email == null)
             {
@@ -174,8 +174,7 @@ namespace Expense_Tracker_2._0.Controllers
                 return BadRequest("Please verify your email address");
             }
 
-            //else return the JWT token
-            string token = CreateJwtToken(user);
+            string token = _jwtService.CreateToken(user);
 
             return Ok(token);
         }
@@ -206,7 +205,7 @@ namespace Expense_Tracker_2._0.Controllers
                 return BadRequest("There is already a user registered with this email address.");
             }
 
-            request.Email = EmailValidation(request.Email) ? request.Email = request.Email : null;
+            request.Email = _emailService.IsValid(request.Email) ? request.Email = request.Email : null;
 
             if (request.Email == null)
             {
@@ -250,42 +249,6 @@ namespace Expense_Tracker_2._0.Controllers
             _dbContext.SaveChanges();
 
             return Ok();
-        }
-        private bool EmailValidation(string email)
-        {
-            string emialPattern = @"^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$";
-
-            Match match = Regex.Match(email, emialPattern);
-
-            if (match.Success)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private string CreateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-              {
-                  new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                  new Claim(ClaimTypes.Role, user.Role.ToString()),
-              }),
-                Expires = DateTime.UtcNow.AddMinutes(10),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"]
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return tokenHandler.WriteToken(token);
-        }
+        }        
     }
 }
