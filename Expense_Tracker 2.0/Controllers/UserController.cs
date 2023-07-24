@@ -22,19 +22,22 @@ namespace Expense_Tracker_2._0.Controllers
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
         private readonly IValidationToken _validationToken;
+        private readonly ICloudService _cloudService;
 
         public UserController(
             ExpenseTrackerDbContext dbContext, 
             IConfiguration configuration, 
             IJwtService jwtService,
             IEmailService emailService,
-            IValidationToken validationToken)
+            IValidationToken validationToken,
+            ICloudService cloudService)
         {
             _dbContext = dbContext;
             _configuration = configuration;
             _jwtService = jwtService;
             _emailService = emailService;
             _validationToken = validationToken;
+            _cloudService = cloudService;
         }
 
         [HttpPost]
@@ -249,6 +252,14 @@ namespace Expense_Tracker_2._0.Controllers
             _dbContext.SaveChanges();
 
             return Ok();
-        }        
+        }
+
+        [HttpPost]
+        public ActionResult UploadImage()
+        {
+            string url = _cloudService.UploadImage();
+
+            return Ok(url);
+        }
     }
 }

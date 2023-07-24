@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ExpenseTrackerDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+}, ServiceLifetime.Singleton);
 
 //jwt
 builder.Services.AddAuthentication(options =>
@@ -80,6 +80,10 @@ builder.Services.AddCors();
 builder.Services.AddScoped<IJwtService, JwtService>(); //register the JwtService
 builder.Services.AddTransient<IEmailService, EmailService>(); // Register the Email service
 builder.Services.AddTransient<IValidationToken, ValidationTokenService>(); // Register the ValidationToken service
+builder.Services.AddTransient<ICloudService, CloudService>(); // Register the ValidationToken service
+
+//Background service
+builder.Services.AddHostedService<ExpiredTokensCleanupService>();
 
 var app = builder.Build();
 
