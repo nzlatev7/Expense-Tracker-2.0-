@@ -254,6 +254,76 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Customer, Admin")]
+        [HttpPost]
+        public ActionResult ResetPassword(UserResetPasswordRequest request)
+        {
+            var user = _dbContext.Users
+                .FirstOrDefault(x => x.Email == request.Email);
+
+            if (user == null)
+            {
+                return BadRequest("Invalid email!");
+            }
+
+
+            ValidationToken token;
+
+            if (_dbContext.ValidationTokens.Any(x => x.UserId == user.Id))
+            {
+                token = _validationToken.Resend(user.Id);
+            }
+            else
+            {
+                token = _validationToken.Generate(user.Id);
+            }
+
+            _emailService.SendAsync(new EmailSendAsyncRequest()
+            {
+                RecipientEmail = user.Email,
+                TokenValue = token.Value,
+                ExpirationDate = token.ExpirationDate,
+                Subject = "Reset Password",
+                Body = $"This is the token: {token.Value} which expire on {token.ExpirationDate}"
+            });
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Customer, Admin")]
+        [HttpPost]
+        public ActionResult VerifyResetPasswordToken(UserVerifyResetPasswordToken request)
+        {
+            var token = _dbContext.ValidationTokens
+                .FirstOrDefault(x => x.Value == request.TokenValue);
+
+            if (token == null)
+            {
+                return BadRequest("Invalid verification code. Please enter the correct code or request a new one.");
+            }
+
+            if (token.ExpirationDate < DateTime.UtcNow)
+            {
+                _validationToken.Clear(token.Value);
+
+                return BadRequest("Verification code has expired. Please request a new one.");
+            }
+
+            var user = _dbContext.Users
+                .FirstOrDefault(x => x.Id == token.UserId);
+
+            if (request.NewPassword.Length < 8 || request.NewPassword.Length > 25)
+            {
+                return BadRequest("Password Length");
+            }
+
+            user.Password = request.NewPassword;
+            _dbContext.SaveChanges();
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "Customer, Admin")]
         [HttpPost]
         public ActionResult UploadImage()
         {
