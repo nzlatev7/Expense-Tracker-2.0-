@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Expense_Tracker_2._0
 {
     public class ExpenseTrackerDbContext : DbContext
-    {    
+    {
+        public ExpenseTrackerDbContext() { }
         public ExpenseTrackerDbContext(DbContextOptions<ExpenseTrackerDbContext> options) : base(options) { }
 
         //tables

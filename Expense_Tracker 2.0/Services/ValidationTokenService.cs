@@ -22,7 +22,7 @@ namespace Expense_Tracker_2._0.Services
                 token = CreateToken();
             }
 
-            DateTime expirationDate = DateTime.UtcNow.AddMinutes(10);
+            DateTime expirationDate = DateTime.UtcNow.AddSeconds(50);
 
             ValidationToken validationToken = new ValidationToken
             {
@@ -48,13 +48,12 @@ namespace Expense_Tracker_2._0.Services
                 _dbContext.ValidationTokens.Remove(validationToken);
                 _dbContext.SaveChanges();
             }
-        }      
+        } 
 
         public ValidationToken Resend(int userId)
         {
             var existingToken = _dbContext.ValidationTokens
-                .Where(x => x.UserId == userId)
-                .FirstOrDefault();
+                .FirstOrDefault(x => x.UserId == userId);
 
             if (existingToken != null)
             {
