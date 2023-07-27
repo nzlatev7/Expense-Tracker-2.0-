@@ -22,7 +22,7 @@ namespace Expense_Tracker_2._0.Services
                 token = CreateToken();
             }
 
-            DateTime expirationDate = DateTime.UtcNow.AddSeconds(50);
+            DateTime expirationDate = DateTime.UtcNow.AddSeconds(120);
 
             ValidationToken validationToken = new ValidationToken
             {

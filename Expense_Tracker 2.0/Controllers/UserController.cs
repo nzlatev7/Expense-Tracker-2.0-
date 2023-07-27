@@ -18,26 +18,28 @@ namespace Expense_Tracker_2._0.Controllers
     public class UserController : ControllerBase
     {
         private readonly ExpenseTrackerDbContext _dbContext;
-        private readonly IConfiguration _configuration;
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
         private readonly IValidationToken _validationToken;
         private readonly ICloudService _cloudService;
 
+        private readonly ILogger<UserController> _logger;
+
         public UserController(
             ExpenseTrackerDbContext dbContext, 
-            IConfiguration configuration, 
             IJwtService jwtService,
             IEmailService emailService,
             IValidationToken validationToken,
-            ICloudService cloudService)
+            ICloudService cloudService,
+            ILogger<UserController> logger)
         {
             _dbContext = dbContext;
-            _configuration = configuration;
             _jwtService = jwtService;
             _emailService = emailService;
             _validationToken = validationToken;
             _cloudService = cloudService;
+
+            _logger = logger;
         }
 
         [HttpPost]
@@ -178,6 +180,9 @@ namespace Expense_Tracker_2._0.Controllers
             }
 
             string token = _jwtService.CreateToken(user);
+
+            ////Log an informational message to the debug and console (by default)
+            _logger.LogInformation("The user: {user} is successfully log in!", user.UserName);
 
             return Ok(token);
         }
