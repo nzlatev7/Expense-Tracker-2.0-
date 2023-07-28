@@ -330,9 +330,9 @@ namespace Expense_Tracker_2._0.Controllers
 
         [Authorize(Roles = "Customer, Admin")]
         [HttpPost]
-        public ActionResult UploadImage()
+        public ActionResult UploadPhoto(IFormFile photo)
         {
-            string url = _cloudService.UploadImage();
+            string url = _cloudService.UploadImage(photo);
 
             return Ok(url);
         }

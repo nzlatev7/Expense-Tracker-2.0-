@@ -2,7 +2,7 @@
 {
     public interface ICloudService
     {
-        string UploadImage();
+        string UploadImage(IFormFile photo);
 
         void DeleteImage();
     }

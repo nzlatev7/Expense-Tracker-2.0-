@@ -13,7 +13,7 @@ namespace Expense_Tracker_2._0.Services
             _configuration = configuration;
         }
 
-        public string UploadImage() //IFormFile imageFile
+        public string UploadImage(IFormFile photo)
         {
 
             //these values are in the Secret Manager
@@ -29,9 +29,9 @@ namespace Expense_Tracker_2._0.Services
 
             ImageUploadParams uploadParams = new ImageUploadParams()
             {
-                File = new FileDescription(@"{filePath}"),
+                File = new FileDescription(photo.Name, photo.OpenReadStream()),
                 Folder = "ProfilePictures",
-                PublicId = "123456", //every time new unique code
+                PublicId = "123", //every time new unique code
             };
 
             var uploadResult = cloudinary.Upload(uploadParams);
