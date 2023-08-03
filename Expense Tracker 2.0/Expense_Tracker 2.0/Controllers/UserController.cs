@@ -1,19 +1,16 @@
-﻿using Expense_Tracker_2._0.Models.DB;
+﻿using Expense_Tracker_2._0.Constants;
+using Expense_Tracker_2._0.Models.DB;
 using Expense_Tracker_2._0.Models.Request;
 using Expense_Tracker_2._0.Models.Response;
 using Expense_Tracker_2._0.Services;
 using Expense_Tracker_2._0.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Expense_Tracker_2._0.Controllers
 {
     [ApiController]
+    [Authorize(Roles = "Customer, Admin")]
     [Route("[controller]/[action]")]
     public class UserController : ControllerBase
     {
@@ -43,6 +40,7 @@ namespace Expense_Tracker_2._0.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult Register(UserRegisterRequest request)
         {
             bool isNotUniqueUsername = _dbContext.Users
@@ -51,30 +49,31 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (isNotUniqueUsername)
             {
-                return BadRequest("Username is not unique");
+                return BadRequest(ResponseMessages.UserNotUnique);
             }
 
-            if (request.UserName.Length < 4 || request.UserName.Length > 25)
+            if (request.UserName.Length < AppConstants.UsernameMinLength 
+                || request.UserName.Length > AppConstants.UsernameMaxLength)
             {
-                return BadRequest("Username Length");
+                return BadRequest(ResponseMessages.UserNameLength);
             }
 
-            if (request.Password.Length < 8 || request.Password.Length > 25)
+            if (request.Password.Length < AppConstants.PasswordMinLength 
+                || request.Password.Length > AppConstants.PasswordMaxLength)
             {
-                return BadRequest("Password Length");
+                return BadRequest(ResponseMessages.PasswordLength);
             }
 
-            //email validation
             if (_dbContext.Users.Any(x => x.Email == request.Email))
             {
-                return BadRequest("There is already a user registered with this email address.");
+                return BadRequest(ResponseMessages.EmailExists);
             }
             
             request.Email = _emailService.IsValid(request.Email) ? request.Email = request.Email : null;
 
             if (request.Email == null)
             {
-                return BadRequest("Invalid Email");
+                return BadRequest(ResponseMessages.EmailInvalid);
             }
 
 
@@ -95,14 +94,15 @@ namespace Expense_Tracker_2._0.Controllers
                     RecipientEmail = user.Email,
                     TokenValue = token.Value,
                     ExpirationDate = token.ExpirationDate,
-                    Subject = "Verify your Email Address!",
-                    Body = $"This is the token: {token.Value} which expire on {token.ExpirationDate}"
+                    Subject = AppConstants.EmailSubjectVerification,
+                    Body = string.Format(AppConstants.EmailBodyVerification, token.Value, token.ExpirationDate)
                 });
 
             return Ok();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult VerifyEmailToken(UserVerifyEmailTokenRequest request)
         {
             var token = _dbContext.ValidationTokens
@@ -111,15 +111,14 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (token == null)
             {
-                return BadRequest("Invalid verification code. Please enter the correct code or request a new one.");
+                return BadRequest(ResponseMessages.InvalidVerificationCode);
             }
 
             if (token.ExpirationDate < DateTime.UtcNow)
             {
-                //clear the token
                 _validationToken.Clear(request.TokenValue);
 
-                return BadRequest("Verification code has expired. Please request a new one.");
+                return BadRequest(ResponseMessages.VerificationCodeExpired);
             }
 
             var userForVerification = _dbContext.Users
@@ -129,13 +128,13 @@ namespace Expense_Tracker_2._0.Controllers
             userForVerification.IsEmailVerified = true;
             _dbContext.SaveChanges();
 
-            //clear the token
             _validationToken.Clear(request.TokenValue);
 
-            return Ok("Verified! You have successfully verified your account.");
+            return Ok(ResponseMessages.EmailVerified);
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult ResendEmailToken(UserResendEmailTokenRequest request)
         {
             var user = _dbContext.Users
@@ -144,7 +143,7 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (user == null)
             {
-                return BadRequest("Invalid email!");
+                return BadRequest(ResponseMessages.EmailInvalid);
             }
 
             var token = _validationToken.Resend(user.Id);
@@ -155,14 +154,15 @@ namespace Expense_Tracker_2._0.Controllers
                     RecipientEmail = request.Email,
                     TokenValue = token.Value,
                     ExpirationDate = token.ExpirationDate,
-                    Subject = "Verify your Email Address!",
-                    Body = $"This is the token: {token.Value} which expire on {token.ExpirationDate}"
-                });
+                    Subject = AppConstants.EmailSubjectVerification,
+                    Body = string.Format(AppConstants.EmailBodyVerification, token.Value, token.ExpirationDate)
+                }); 
 
             return Ok();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public ActionResult Login(UserLoginRequest request)
         {
             var user = _dbContext.Users
@@ -171,23 +171,24 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (user == null)
             {
-                return BadRequest("Wrong username or password.");
+                return BadRequest(ResponseMessages.WrongUsernameOrPass);
             }
 
             if (!user.IsEmailVerified)
             {
-                return BadRequest("Please verify your email address");
+                return BadRequest(ResponseMessages.EmailVerificationRequired);
             }
 
             string token = _jwtService.CreateToken(user);
 
+            // Some Exercise
             ////Log an informational message to the debug and console (by default)
-            _logger.LogInformation("The user: {user} is successfully log in!", user.UserName);
+            _logger.LogInformation($"The user: {user.UserName} is successfully log in!", user.UserName);
 
             return Ok(token);
         }
 
-        [Authorize(Roles = "Customer, Admin")]
+        
         [HttpPut]
         public ActionResult Update(UserUpdateRequest request)
         {
@@ -195,29 +196,31 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (_dbContext.Users.Any(x => x.UserName == request.UserName))
             {
-                return BadRequest("Username is not unique");
+                return BadRequest(ResponseMessages.UserNotUnique);
             }
 
-            if (request.UserName.Length < 4 || request.UserName.Length > 25)
+            if (request.UserName.Length < AppConstants.UsernameMinLength
+                || request.UserName.Length > AppConstants.UsernameMaxLength)
             {
-                return BadRequest("Username Length");
+                return BadRequest(ResponseMessages.UserNameLength);
             }
 
-            if (request.Password.Length < 8 || request.Password.Length > 25)
+            if (request.Password.Length < AppConstants.PasswordMinLength 
+                || request.Password.Length > AppConstants.PasswordMaxLength)
             {
-                return BadRequest("Password Length");
+                return BadRequest(ResponseMessages.PasswordLength);
             }
 
             if (_dbContext.Users.Any(x => x.Email == request.Email))
             {
-                return BadRequest("There is already a user registered with this email address.");
+                return BadRequest(ResponseMessages.EmailExists);
             }
 
             request.Email = _emailService.IsValid(request.Email) ? request.Email = request.Email : null;
 
             if (request.Email == null)
             {
-                return BadRequest("Invalid Email");
+                return BadRequest(ResponseMessages.EmailInvalid);
             }
 
             var userForUpdate = _dbContext.Users.Find(id);
@@ -230,7 +233,6 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = "Customer, Admin")]
         [HttpGet]
         public UserGetInfoResponse GetInfo()
         {
@@ -246,7 +248,6 @@ namespace Expense_Tracker_2._0.Controllers
             }).Single();
         }
 
-        [Authorize(Roles = "Customer, Admin")]
         [HttpDelete]
         public ActionResult Delete()
         {
@@ -259,7 +260,6 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = "Customer, Admin")]
         [HttpPost]
         public ActionResult ResetPassword(UserResetPasswordRequest request)
         {
@@ -268,7 +268,7 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (user == null)
             {
-                return BadRequest("Invalid email!");
+                return BadRequest(ResponseMessages.EmailInvalid);
             }
 
 
@@ -288,14 +288,13 @@ namespace Expense_Tracker_2._0.Controllers
                 RecipientEmail = user.Email,
                 TokenValue = token.Value,
                 ExpirationDate = token.ExpirationDate,
-                Subject = "Reset Password",
-                Body = $"This is the token: {token.Value} which expire on {token.ExpirationDate}"
+                Subject = AppConstants.PasswordSubjectVerification,
+                Body = string.Format(AppConstants.EmailBodyVerification, token.Value, token.ExpirationDate)
             });
 
             return Ok();
         }
 
-        [Authorize(Roles = "Customer, Admin")]
         [HttpPost]
         public ActionResult VerifyResetPasswordToken(UserVerifyResetPasswordToken request)
         {
@@ -304,22 +303,23 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (token == null)
             {
-                return BadRequest("Invalid verification code. Please enter the correct code or request a new one.");
+                return BadRequest(ResponseMessages.InvalidVerificationCode);
             }
 
             if (token.ExpirationDate < DateTime.UtcNow)
             {
                 _validationToken.Clear(token.Value);
 
-                return BadRequest("Verification code has expired. Please request a new one.");
+                return BadRequest(ResponseMessages.VerificationCodeExpired);
             }
 
             var user = _dbContext.Users
                 .FirstOrDefault(x => x.Id == token.UserId);
 
-            if (request.NewPassword.Length < 8 || request.NewPassword.Length > 25)
+            if (request.NewPassword.Length < AppConstants.PasswordMinLength
+               || request.NewPassword.Length > AppConstants.PasswordMaxLength)
             {
-                return BadRequest("Password Length");
+                return BadRequest(ResponseMessages.PasswordLength);
             }
 
             user.Password = request.NewPassword;
@@ -328,7 +328,6 @@ namespace Expense_Tracker_2._0.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = "Customer, Admin")]
         [HttpPost]
         public ActionResult UploadPhoto(IFormFile photo)
         {

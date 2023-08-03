@@ -83,7 +83,7 @@ builder.Services.AddTransient<IValidationToken, ValidationTokenService>(); // Re
 builder.Services.AddTransient<ICloudService, CloudService>(); // Register the ValidationToken service
 
 //Background service
-builder.Services.AddHostedService<ExpiredTokensCleanupService>();
+builder.Services.AddHostedService<ExpiredTokensCleanUpService>();
 
 var app = builder.Build();
 

@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using Expense_Tracker_2._0.Constants;
 
 namespace Expense_Tracker_2._0.Controllers
 {
@@ -18,12 +19,11 @@ namespace Expense_Tracker_2._0.Controllers
     [Route("[controller]/[action]")]
     public class AdminController : Controller
     {
-        private IConfiguration _configuration;
         private ExpenseTrackerDbContext _dbContext;
-        public AdminController(ExpenseTrackerDbContext dbContext, IConfiguration configuration)
+
+        public AdminController(ExpenseTrackerDbContext dbContext)
         {
             _dbContext = dbContext;
-            _configuration = configuration;
         }
 
         [HttpPut]
@@ -36,17 +36,19 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (isNotUniqueUsername)
             {
-                return BadRequest("Username is not unique");
+                return BadRequest(ResponseMessages.UserNotUnique);
             }
 
-            if (request.UserName.Length < 4 || request.UserName.Length > 25)
+            if (request.UserName.Length < AppConstants.UsernameMinLength
+               || request.UserName.Length > AppConstants.UsernameMaxLength)
             {
-                return BadRequest("Username Length");
+                return BadRequest(ResponseMessages.UserNameLength);
             }
 
-            if (request.Password.Length < 8 || request.Password.Length > 25)
+            if (request.Password.Length < AppConstants.PasswordMinLength
+                || request.Password.Length > AppConstants.PasswordMaxLength)
             {
-                return BadRequest("Password Length");
+                return BadRequest(ResponseMessages.PasswordLength);
             }
 
             userForUpdate.UserName = request.UserName;
@@ -64,7 +66,7 @@ namespace Expense_Tracker_2._0.Controllers
 
             if (pageNumber <= 0)
             {
-                return BadRequest("Page number must be a positive integer.");
+                return BadRequest(ResponseMessages.PageNumInvalid);
             }
 
             var users = _dbContext.Users
@@ -113,18 +115,17 @@ namespace Expense_Tracker_2._0.Controllers
 
         [HttpDelete]
         public ActionResult DeleteUser(AdminDeleteRequest request)
-        {
-            const string password = "admin";
-
-            if (password != request.Password)
+        {  
+            if (AppConstants.AdminPassword != request.Password)
             {
-                return Unauthorized("Invalid password");
+                return Unauthorized(ResponseMessages.PasswordInvalid);
             }
 
             var userForDelete = _dbContext.Users.Find(request.Id);
 
             _dbContext.Users.Remove(userForDelete);
             _dbContext.SaveChanges();
+
             return Ok();
         }
 

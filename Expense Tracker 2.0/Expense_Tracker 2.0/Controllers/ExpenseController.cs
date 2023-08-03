@@ -1,28 +1,26 @@
-﻿using Expense_Tracker_2._0.Models.DB;
+﻿using Expense_Tracker_2._0.Constants;
+using Expense_Tracker_2._0.Models.DB;
 using Expense_Tracker_2._0.Models.Request;
 using Expense_Tracker_2._0.Models.Response;
-using Expense_Tracker_2._0.Services;
+using Expense_Tracker_2._0.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Expense_Tracker_2._0.Controllers
 {
-    [Authorize(Roles = "Customer, Admin")]
     [ApiController]
+    [Authorize(Roles = "Customer, Admin")]
     [Route("[controller]/[action]")]
     public class ExpenseController : ControllerBase
     {
-        private IConfiguration _configuration;
         private IJwtService _jwtService;
         private ExpenseTrackerDbContext _dbContext;
 
         public ExpenseController(
-            ExpenseTrackerDbContext dbContext, 
-            IConfiguration configuration, 
+            ExpenseTrackerDbContext dbContext,
             IJwtService jwtService)
         {
             _dbContext = dbContext;
-            _configuration = configuration;
             _jwtService = jwtService;
         }
 
@@ -30,6 +28,7 @@ namespace Expense_Tracker_2._0.Controllers
         public List<ExpenseGetAllResponse> GetAllByUserId()
         {
             int userId = _jwtService.GetUserIdFromToken(User);
+
             return _dbContext.Expenses.Where(x => x.UserId == userId).Select(x => new ExpenseGetAllResponse()
             {
                 Id = x.Id,
@@ -43,16 +42,16 @@ namespace Expense_Tracker_2._0.Controllers
         [HttpPost]
         public ActionResult Create(ExpenseCreateRequest request)
         {
-            //Validation for Name Lenght, (name -> 1 - 30)
-            if (request.Name.Length < 1 || request.Name.Length > 30)
+            if (request.Name.Length < AppConstants.NameMinLength 
+                || request.Name.Length > AppConstants.NameMaxLength)
             {
-                return BadRequest("Name Lenght");
+                return BadRequest(ResponseMessages.NameLength);
             }
-
-            //Validation for Name Lenght, (amount -> 0 - 10000)
-            if (request.Amount < 0 || request.Amount > 10000)
+            
+            if (request.Amount < AppConstants.AmountMin 
+                || request.Amount > AppConstants.AmountMax)
             {
-                return BadRequest("Invalid Amount");
+                return BadRequest(ResponseMessages.AmountInvalid);
             }
 
             Expense newExpense = new Expense();
@@ -65,21 +64,23 @@ namespace Expense_Tracker_2._0.Controllers
             }
             _dbContext.Expenses.Add(newExpense);
             _dbContext.SaveChanges();
+
             return Ok();
         }
 
         [HttpPut]
         public ActionResult Update(ExpenseUpdateRequest request)
         {
-            //Validation for Name Lenght, (name -> 1 - 30)
-            if (request.Name.Length < 1 || request.Name.Length > 30)
+            if (request.Name.Length < AppConstants.NameMinLength
+                || request.Name.Length > AppConstants.NameMaxLength)
             {
-                return BadRequest("Name Lenght");
+                return BadRequest(ResponseMessages.NameLength);
             }
-            //Validation for Name Lenght, (amount -> 0 - 10000)
-            if (request.Amount < 0 || request.Amount > 10000)
+
+            if (request.Amount < AppConstants.AmountMin
+                || request.Amount > AppConstants.AmountMax)
             {
-                return BadRequest("Invalid Amount");
+                return BadRequest(ResponseMessages.AmountInvalid);
             }
 
             var expenseForUpdate = _dbContext.Expenses.Find(request.Id);
@@ -90,6 +91,7 @@ namespace Expense_Tracker_2._0.Controllers
             expenseForUpdate.Amount = request.Amount;
 
             _dbContext.SaveChanges();
+
             return Ok();
         }
 
@@ -97,6 +99,7 @@ namespace Expense_Tracker_2._0.Controllers
         public ActionResult Delete(ExpenseDeleteRequest request)
         {
             var expenseForDelete = _dbContext.Expenses.Find(request.Id);
+
             if (expenseForDelete == null)
             {
                 return NotFound();
@@ -104,6 +107,7 @@ namespace Expense_Tracker_2._0.Controllers
             
             _dbContext.Expenses.Remove(expenseForDelete);
             _dbContext.SaveChanges();
+
             return Ok();
         }
     }
